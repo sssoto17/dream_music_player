@@ -1,0 +1,16 @@
+[
+  {
+    "name": "email",
+    "label": "Email/username",
+    "type": "text",
+    "testValue": "sssoto@live.dk",
+    "placeholder": "Enter email or username"
+  },
+  {
+    "name": "password",
+    "label": "Password",
+    "type": "password",
+    "testValue": "Pass@1234",
+    "placeholder": "Enter password"
+  }
+]

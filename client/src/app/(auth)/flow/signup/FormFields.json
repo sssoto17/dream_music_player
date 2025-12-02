@@ -1,0 +1,46 @@
+[
+  {
+    "name": "user_avatar",
+    "label": "Choose an avatar",
+    "type": "file",
+    "accept": "image/*"
+  },
+  {
+    "name": "user_username",
+    "label": "Username",
+    "type": "text",
+    "testValue": "sssoto"
+  },
+  {
+    "name": "user_first_name",
+    "label": "First name",
+    "type": "text",
+    "testValue": "Sabrina",
+    "cols": "col-span-3"
+  },
+  {
+    "name": "user_last_name",
+    "label": "Last name",
+    "type": "text",
+    "testValue": "Soto",
+    "cols": "col-span-3"
+  },
+  {
+    "name": "user_email",
+    "label": "Email",
+    "type": "email",
+    "testValue": "sssoto@live.dk"
+  },
+  {
+    "name": "user_password",
+    "label": "Password",
+    "type": "password",
+    "testValue": "password"
+  },
+  {
+    "name": "user_password_confirm",
+    "label": "Confirm password",
+    "type": "password",
+    "testValue": "password"
+  }
+]
