@@ -25,7 +25,8 @@ def create_app(test_config=None, config_class: type = Config):
         db.init_app(app)
         migrate.init_app(app, db)
 
-    from . import api, auth
+    from . import admin, api, auth
+    app.register_blueprint(admin.app)
     app.register_blueprint(api.app)
     app.register_blueprint(auth.app)
     

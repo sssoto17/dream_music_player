@@ -1,81 +1,82 @@
 services:
-  dmp_frontend:
-    container_name: dmp_frontend
-    build:
-      context: ./client
-      dockerfile: dev.Dockerfile
-    develop:
-      watch:
-        - action: sync
-          path: ./client/src
-          target: /app/frontend/src
-          initial_sync: true
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: ./client/package.json
-    ports:
-      - 3000:3000
-    depends_on:
-      - dmp_backend
-    env_file:
-      - .env
-      - .spotify.env
-    networks:
-      - app-net
+    dmp_frontend:
+        container_name: dmp_frontend
+        build:
+            context: ./client
+            dockerfile: dev.Dockerfile
+        develop:
+            watch:
+                - action: sync
+                  path: ./client/src
+                  target: /app/frontend/src
+                  initial_sync: true
+                  ignore:
+                      - node_modules/
+                - action: rebuild
+                  path: ./client/package.json
+        ports:
+            - 3000:3000
+        depends_on:
+            - dmp_backend
+        env_file:
+            - .env
+            - .spotify.env
+        networks:
+            - app-net
 
-  dmp_backend:
-    container_name: dmp_backend
-    build:
-      context: ./server
-      dockerfile: dev.Dockerfile
-    develop:
-      watch:
-        - action: sync
-          path: ./server/src
-          target: /app/backend/src
-          initial_sync: true
-        - action: sync+restart
-          path: ./server/src/models.py
-          target: /app/backend/src/models.py
-    depends_on:
-      - dmp_db
-    env_file:
-      - .env
-      - .spotify.env
-    volumes:
-      - db-migrations:/app/backend/migrations
-    ports:
-      - 5000:5000
-    networks:
-      - app-net
+    dmp_backend:
+        container_name: dmp_backend
+        build:
+            context: ./server
+            dockerfile: dev.Dockerfile
+        develop:
+            watch:
+                - action: sync
+                  path: ./server/src
+                  target: /app/backend/src
+                  initial_sync: true
+                - action: sync+restart
+                  path: ./server/src/models.py
+                  target: /app/backend/src/models.py
+        depends_on:
+            - dmp_db
+        env_file:
+            - .env
+            - .spotify.env
+        volumes:
+            - db-migrations:/app/backend/migrations
+            - ./server/languages:/app/backend/languages
+        ports:
+            - 5000:5000
+        networks:
+            - app-net
 
-  dmp_db:
-    container_name: dmp_db
-    image: mariadb:10.6.20
-    restart: always
-    env_file: .env
-    volumes:
-      - db-data:/var/lib/mysql
-    ports:
-      - 3306:3306
-    networks:
-      - app-net
+    dmp_db:
+        container_name: dmp_db
+        image: mariadb:10.6.20
+        restart: always
+        env_file: .env
+        volumes:
+            - db-data:/var/lib/mysql
+        ports:
+            - 3306:3306
+        networks:
+            - app-net
 
-  dmp_admin:
-    container_name: dmp_admin
-    image: phpmyadmin/phpmyadmin
-    depends_on:
-      - dmp_db
-    env_file: .env
-    ports:
-      - 8080:80
-    networks:
-      - app-net
+    dmp_admin:
+        container_name: dmp_admin
+        image: phpmyadmin/phpmyadmin
+        depends_on:
+            - dmp_db
+        env_file: .env
+        ports:
+            - 8080:80
+        networks:
+            - app-net
 
 volumes:
-  db-data: {}
-  db-migrations: {}
+    db-data: {}
+    db-migrations: {}
 networks:
-  app-net:
-    driver: bridge
+    app-net:
+        driver: bridge

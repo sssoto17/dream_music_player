@@ -1,0 +1,34 @@
+{
+    "email": {
+        "english": "Email",
+        "danish": "Email"
+    },
+    "username": {
+        "english": "Username",
+        "danish": "Brugernavn"
+    },
+    "password": {
+        "english": "Password",
+        "danish": "Adgangskode"
+    },
+    "password_confirm": {
+        "english": "Confirm password",
+        "danish": "Bekræft adgangskode"
+    },
+    "first_name": {
+        "english": "First name",
+        "danish": "Fornavn"
+    },
+    "last_name": {
+        "english": "Last name",
+        "danish": "Efternavn"
+    },
+    "avatar": {
+        "english": "Choose your avatar",
+        "danish": "Vælg et profilbillede"
+    },
+    "test": {
+        "english": "Testing",
+        "danish": "Tester"
+    }
+}

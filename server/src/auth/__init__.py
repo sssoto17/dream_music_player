@@ -32,34 +32,29 @@ def authenticate_user():
             ic(ex)
             return make_response({"error": str(ex)}, 400)
     
-@app.route("/me/<int:id>", methods=["GET", "PATCH"])
+@app.route("/me/<int:id>", methods=["GET", "PATCH", "DELETE"])
 def auth_user(id):
-    if request.method == "GET":
-        q = select(User).where(User.id == id)
-        user = db.session.scalar(q).to_dict(auth=True)
+    q = select(User).where(User.id == id)
+    user = db.session.scalar(q)
 
-        return make_response(user, 200)
+    if request.method == "GET": return make_response(user.to_dict(auth=True), 200)
     
     if request.method == "PATCH":
-        q = select(User).where(User.id == id)
-        user = db.session.scalar(q)
         try:
             user.username = request.form["username"].strip()
             user.email = request.form["email"].strip()
             user.first_name = request.form["first_name"].strip()
             user.last_name = request.form["last_name"].strip()
             user.password = generate_password_hash(request.form["password"].strip())
-            db.session.commit()
 
             avatar_file = request.files["avatar"]
-            secure_avatar = secure_filename(avatar_file.filename)
-            avatar_path = path.join(current_app.config["UPLOAD_FOLDER"], secure_avatar)
+            avatar_path = path.join(current_app.config["UPLOAD_FOLDER"], secure_filename(avatar_file.filename))
 
             avatar = Avatar(
                 path = avatar_path,
                 user_id = user.id
             )
-
+            
             db.session.add(avatar)
             db.session.commit()
 
@@ -69,4 +64,17 @@ def auth_user(id):
         except Exception as ex:
             db.session.rollback()
             for arg in ex.args: error = arg
+
             return make_response({"user": user.to_dict(auth=True), "error": error}, 400)
+    
+    if request.method == "DELETE":
+        try:
+            db.session.delete(user)
+            db.session.commit()
+
+            return make_response({"status": "User deleted."}, 200)
+        except Exception as ex:
+            db.session.rollback()
+            for arg in ex.args: error = arg
+
+            return make_response({"user": user, "error": error}, 400)
