@@ -15,14 +15,14 @@ def refresh_token(id):
         try:
             q = select(Refresh_Token).where(Refresh_Token.user_id == id)
             token = db.session.scalars(q).one().to_dict()
-
+            
             return make_response(token, 200)
         except Exception as ex:
             ic(ex)
             return make_response({"error": str(ex)}, 400)
         finally:
             if db.session in locals(): db.session.close()
-    
+
     if request.method == "POST":
         try:
             data = request.get_json()
