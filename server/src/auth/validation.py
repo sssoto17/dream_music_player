@@ -37,3 +37,11 @@ def validate_password(user_password, confirm_password):
     
     return generate_password_hash(user_password, salt_length=25)
     
+def validate_verification_key(key = None):
+    if not key: raise Exception("Invalid key.")
+    
+    REGEX = "^[0-9a-f]{8}[0-9a-f]{4}4[0-9a-f]{3}[89ab][0-9a-f]{3}[0-9a-f]{12}$"
+
+    if not re.match(REGEX, key.strip()): raise Exception("Invalid key.")
+    
+    return key

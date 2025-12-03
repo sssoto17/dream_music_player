@@ -6,7 +6,7 @@ ARG NODE_VERSION=22.16.0
 FROM node:${NODE_VERSION}-alpine AS base
 
 # Set working directory for all build stages.
-WORKDIR /app/frontend
+WORKDIR /app
 
 # Create a stage for installing production dependecies.
 FROM base AS deps

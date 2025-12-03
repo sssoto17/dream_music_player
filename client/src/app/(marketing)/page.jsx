@@ -5,43 +5,53 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 export default function Home() {
-  const imgSrc = `${process.env.SERVER}/static/uploads/20250907_2003031.jpg`;
-  return (
-    <main className="h-screen">
-      <h1>Home</h1>
-      <Link className="block" href="/login">
-        Login
-      </Link>
-      <Link className="block" href={`/album/${process.env.SPOTIFY_TEST_ALBUM}`}>
-        Go to album
-      </Link>
-      <Image src={imgSrc} width={400} height={400} alt="" />
-      <Suspense>
-        <Test />
-      </Suspense>
-    </main>
-  );
+	const imgSrc = `${process.env.SERVER}/static/uploads/20250907_2003031.jpg`;
+
+	const testObj = {};
+
+	const objKeys = Object.keys(testObj);
+
+	console.log(!objKeys.length);
+
+	return (
+		<main className="h-screen">
+			<h1>Home</h1>
+			<Link className="block" href="/login">
+				Login
+			</Link>
+			<Link
+				className="block"
+				href={`/album/${process.env.SPOTIFY_TEST_ALBUM}`}
+			>
+				Go to album
+			</Link>
+			<Image src={imgSrc} width={400} height={400} alt="" />
+			<Suspense>
+				<Test />
+			</Suspense>
+		</main>
+	);
 }
 
 async function Test() {
-  // TESTING AUTH SCOPING
-  const authUser = await verifySession();
+	// TESTING AUTH SCOPING
+	const authUser = await verifySession();
 
-  if (!authUser) {
-    console.log("not authenticated");
-    return;
-  }
+	if (!authUser) {
+		console.log("not authenticated");
+		return;
+	}
 
-  // TESTING FETCH WITH SQLALCHEMY QUERIES
-  const user = await getUsers(39);
+	// TESTING FETCH WITH SQLALCHEMY QUERIES
+	const user = await getUsers(39);
 
-  if (user.error) {
-    return <p>No user found.</p>;
-  }
+	if (user.error) {
+		return <p>No user found.</p>;
+	}
 
-  return (
-    <div>
-      <p> {user.username} </p>
-    </div>
-  );
+	return (
+		<div>
+			<p> {user.username} </p>
+		</div>
+	);
 }

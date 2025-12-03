@@ -11,7 +11,7 @@ from ..api import *
 
 app = Blueprint('spotify', __name__)
 
-client_url = f"{environ["CLIENT_URL"]}/flow"
+client_url = environ["CLIENT_URL"]
 api_url = environ["SPOTIFY_API_URL"]
 access_url = environ["SPOTIFY_ACCESS_URL"]
 token_url = environ["SPOTIFY_TOKEN_URL"]
@@ -65,8 +65,8 @@ def spotify_callback():
             spotify_data = get(f"{api_url}/me", headers={"Authorization": "Bearer " + token["access_token"]}).json()
 
             payload = {
-                "username": spotify_data["display_name"].replace(" ", "_"),
-                "email": spotify_data["email"],
+                "username": "",
+                "email": "",
                 "password": "temp_password",
                 "first_name": spotify_data["display_name"].split()[0], 
                 "last_name": spotify_data["display_name"].split()[-1],
@@ -74,7 +74,13 @@ def spotify_callback():
                 }
 
             user = post(url_for("api.users.users", _external=True), data=payload).json()
-            url = f"{client_url}?id={user["id"]}&username={user["username"]}&token={token["access_token"]}"
+
+            if user["error"]:
+                ic("user verified")
+                url = f"{client_url}/login?exists=1"
+                return redirect(url)
+
+            url = f"{client_url}/auth/signup?id={user["id"]}&key={user["verification_key"]}&token={token["access_token"]}"
             return redirect(url)
     except Exception as ex:
         ic(ex)

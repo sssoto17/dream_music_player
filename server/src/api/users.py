@@ -1,10 +1,10 @@
-from flask import Blueprint, request, make_response
+from flask import Blueprint, request, make_response, render_template
 from sqlalchemy import select
 from uuid import uuid4
+from datetime import datetime
 
 from ..db import db
 from ..db.models import *
-
 from ..auth.validation import *
 
 app = Blueprint("users",__name__)
@@ -25,7 +25,6 @@ def users():
     
     if request.method == "POST":
         try:
-
             user = User(
                 username = request.form["username"].strip(),
                 email = request.form["email"],
@@ -54,13 +53,31 @@ def users():
     
 @app.route("/users/<int:id>")
 @app.route("/users/<string:username>")
-def user(id = None, username = None):
+def user(id = None, username = None, key = None):
     try:
         if id:
             q = select(User).where(User.id == id)
         if username:
             q = select(User).where(User.username == username)
+        
         user = db.session.scalar(q)
+
+        return make_response(user.to_dict(), 200)
+    except Exception as ex:
+        return make_response({"error": str(ex)}, 400)
+    
+@app.route("/users/verify/<string:key>")
+def verify_user(key):
+    try:
+        q = select(User).where(User.verification_key == validate_verification_key(key))
+        user = db.session.scalar(q)
+
+        if not user: raise Exception("Invalid key.")
+
+        user.verified_at = datetime.now()
+        user.verification_key = ""
+
+        db.session.commit()
 
         return make_response(user.to_dict(), 200)
     except Exception as ex:

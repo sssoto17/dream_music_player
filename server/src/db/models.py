@@ -1,6 +1,6 @@
 from . import db
 
-from sqlalchemy import String, ForeignKey, inspect
+from sqlalchemy import String, ForeignKey, PrimaryKeyConstraint, inspect
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from typing import Optional, List
@@ -26,6 +26,7 @@ class User(db.Model, IDMixin, TimeStampMixin):
      password: Mapped[str] = mapped_column(String(180), nullable=False)
      first_name: Mapped[Optional[str]] = mapped_column(String(30))
      last_name: Mapped[Optional[str]] = mapped_column(String(30))
+     bio: Mapped[Optional[str]] = mapped_column(String(500))
      verification_key: Mapped[Optional[str]] = mapped_column(String(32))
      verified_at: Mapped[Optional[datetime]] = mapped_column(default=None)
      deleted_at: Mapped[Optional[datetime]] = mapped_column(default=None, sort_order=3)
@@ -65,3 +66,15 @@ class Avatar(db.Model, IDMixin, UserFKMixin):
 
 # class Playlist(db.Model, IDMixin):
 #      pass
+
+class Session(db.Model, UserFKMixin, TimeStampMixin):
+     __tablename__ = "sessions"
+     __table_args__ = (
+          PrimaryKeyConstraint("user_id", "token_id", name="id"),
+     )
+
+     token_id: Mapped[int] = mapped_column(ForeignKey("tokens.id", ondelete="CASCADE"))
+     session_id: Mapped[str] = mapped_column(String(100), unique=True)
+     expires_at: Mapped[datetime] = mapped_column(sort_order=2)
+
+     user: Mapped["User"] = relationship(back_populates="token")
