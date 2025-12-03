@@ -1,7 +1,7 @@
 from os import getcwd
 from flask import Blueprint, make_response
 from requests import get
-from json import dumps
+from json import dumps, load
 from csv import DictReader
 from io import StringIO
 
@@ -19,18 +19,18 @@ def get_languages():
         res = get(url=formSheet)
         csv = StringIO(res.content.decode('utf-8'))
        
-        data = {}
+        data = {
+            "en": {},
+            "dk": {}
+        }
 
         # CREATE DICTIONARY
         reader = DictReader(csv)
-        for row in reader:
-            item = {
-                    'english': row['English'],
-                    'danish': row['Danish'],
-            }
-            
-            data[row['Key']] = item
 
+        for row in reader:
+            data["en"][row["Key"]] = row["English"]
+            data["dk"][row["Key"]] = row["Danish"]
+        
         # CONVERT TO JSON
         json_form = dumps(data, ensure_ascii=False, indent=4)
         path = f"{getcwd()}/languages/forms.json"

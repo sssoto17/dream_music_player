@@ -1,34 +1,20 @@
 {
-    "email": {
-        "english": "Email",
-        "danish": "Email"
+    "en": {
+        "email": "Email",
+        "username": "Username",
+        "password": "Password",
+        "password_confirm": "Confirm password",
+        "first_name": "First name",
+        "last_name": "Last name",
+        "avatar": "Choose your avatar"
     },
-    "username": {
-        "english": "Username",
-        "danish": "Brugernavn"
-    },
-    "password": {
-        "english": "Password",
-        "danish": "Adgangskode"
-    },
-    "password_confirm": {
-        "english": "Confirm password",
-        "danish": "Bekræft adgangskode"
-    },
-    "first_name": {
-        "english": "First name",
-        "danish": "Fornavn"
-    },
-    "last_name": {
-        "english": "Last name",
-        "danish": "Efternavn"
-    },
-    "avatar": {
-        "english": "Choose your avatar",
-        "danish": "Vælg et profilbillede"
-    },
-    "test": {
-        "english": "Testing",
-        "danish": "Tester"
+    "dk": {
+        "email": "Email",
+        "username": "Brugernavn",
+        "password": "Adgangskode",
+        "password_confirm": "Bekræft adgangskode",
+        "first_name": "Fornavn",
+        "last_name": "Efternavn",
+        "avatar": "Vælg et profilbillede"
     }
 }

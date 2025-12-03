@@ -8,7 +8,7 @@ services:
             watch:
                 - action: sync
                   path: ./client/src
-                  target: /app/frontend/src
+                  target: /app/src
                   initial_sync: true
                   ignore:
                       - node_modules/
@@ -33,19 +33,19 @@ services:
             watch:
                 - action: sync
                   path: ./server/src
-                  target: /app/backend/src
+                  target: /app/src
                   initial_sync: true
                 - action: sync+restart
                   path: ./server/src/models.py
-                  target: /app/backend/src/models.py
+                  target: /app/src/models.py
         depends_on:
             - dmp_db
         env_file:
             - .env
             - .spotify.env
         volumes:
-            - db-migrations:/app/backend/migrations
-            - ./server/languages:/app/backend/languages
+            - ./server/migrations:/app/migrations
+            - ./server/languages:/app/languages
         ports:
             - 5000:5000
         networks:
@@ -76,7 +76,6 @@ services:
 
 volumes:
     db-data: {}
-    db-migrations: {}
 networks:
     app-net:
         driver: bridge

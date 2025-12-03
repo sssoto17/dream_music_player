@@ -1,14 +1,16 @@
+from os import getcwd
 from flask import Blueprint, request, make_response
-from sqlalchemy import select
-from uuid import uuid4
+from json import load
 
-from ..db import db
-from ..db.models import *
+app = Blueprint("lang",__name__,url_prefix="/lang")
 
-from ..auth.validation import *
-
-app = Blueprint("lang",__name__)
-
-app.route("/forms")
-def form_languages():
-    pass
+@app.route("/<string:lang>")
+def form_languages(lang = "en"):
+    path = f"{getcwd()}/languages/forms.json"
+    try:
+        
+        with open(path,"r", encoding="utf-8") as f:
+            data = load(f)
+        return make_response(data[lang], 200)
+    except Exception as ex:
+        return str(ex)
