@@ -139,7 +139,6 @@ export async function ResetAccount(key, formData) {
 
 	try {
 		const res = await resetAuthUser(formData, key);
-		console.log(res);
 
 		if (res?.error) {
 			return {
