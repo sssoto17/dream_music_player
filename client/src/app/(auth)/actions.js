@@ -115,6 +115,8 @@ export async function UpdateAccountTest(avatar, { user }, formData) {
 export async function ResetAccountRequest(formData) {
 	const response = await resetUser(formData.get("email"));
 
+	console.log(response);
+
 	if (response.status) {
 		return {
 			status: "Email with a link to reset your password has been sent to the email you provided.",

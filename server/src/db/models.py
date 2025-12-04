@@ -48,6 +48,7 @@ class User(db.Model, IDMixin, TimeStampMixin):
     token: Mapped["Refresh_Token"] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     sessions: Mapped[List["Session"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     avatar: Mapped["Avatar"] = relationship(back_populates="user", cascade="save-update, merge, delete, delete-orphan", single_parent=True)
+    is_blocked: Mapped["Blocked_User"] = relationship(back_populates="user", cascade="all, delete", single_parent=True)
     
     def to_dict(self, auth:bool=False):
         cols = inspect(self).mapper.column_attrs
@@ -101,3 +102,10 @@ class Session(db.Model, UserFKMixin, TimeStampMixin):
 
     # class Playlist(db.Model, IDMixin):
 #      pass
+
+class Blocked_User(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
+    __tablename__ = "users_blocked"
+    __table_args__ = (
+         UniqueConstraint("user_id"),
+    )
+    __user_back_populates__ = "is_blocked"
