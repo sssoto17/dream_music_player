@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getAuthUser } from "@/features/auth/dal";
+import { getAvatarSrc } from "@/lib/utils";
 
 export default function Dashboard() {
 	return (
@@ -16,7 +17,9 @@ export default function Dashboard() {
 async function UserProfile() {
 	const user = await getAuthUser();
 
-	const userAvatar = `${process.env.SERVER}/${user.avatar}`;
+	const src = getAvatarSrc(user?.avatar);
+
+	console.log(src);
 
 	return (
 		<section>
@@ -29,13 +32,8 @@ async function UserProfile() {
 					<Link href="/auth/signout">Sign out</Link>
 				</li>
 			</ul>
-			{user?.avatar && (
-				<Image
-					src={userAvatar}
-					alt="User avatar"
-					width={400}
-					height={500}
-				/>
+			{src && (
+				<Image src={src} alt="User avatar" width={400} height={500} />
 			)}
 		</section>
 	);

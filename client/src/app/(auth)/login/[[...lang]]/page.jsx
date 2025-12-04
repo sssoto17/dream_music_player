@@ -1,4 +1,4 @@
-import { LogIn as submit, ResetAccount } from "../../actions";
+import { LogIn as submit, ResetAccountRequest as reset } from "../../actions";
 import fields from "./FormFields.json";
 import { Suspense } from "react";
 
@@ -46,9 +46,9 @@ function PasswordReset() {
 				<h1 className="text-2xl mb-4 font-extrabold font-display text-amber-500">
 					Forgot your password?
 				</h1>
-				<p>No problem! Reset it below.</p>
+				<p>Reset it below.</p>
 			</header>
-			<form action={ResetAccount}>
+			<form action={reset}>
 				<label
 					className="grid gap-y-1 py-1.5 font-medium text-slate-800"
 					htmlFor="email"

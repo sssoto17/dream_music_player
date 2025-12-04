@@ -1,13 +1,12 @@
-from os import environ, path
-from flask import Blueprint, current_app, request, render_template, make_response
+from os import environ
+from flask import Blueprint, request, render_template, make_response
 from sqlalchemy import select
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
 from uuid import uuid4
 
 from ..db import db
 from ..db.models import *
-from ..utils import ic, send_email
+from ..utils import ic, generate_file_path, save_file, delete_file, send_email
 from .validation import *
 
 from . import spotify, token
@@ -53,7 +52,6 @@ def reset_user(email):
     except Exception as ex:
         ic(ex)
         return make_response({"error": str(ex)}, 400)
-        
 
 @app.route("/me/<int:id>", methods=["GET", "PATCH", "DELETE"])
 def auth_user(id):
@@ -64,26 +62,31 @@ def auth_user(id):
     
     if request.method == "PATCH":
         try:
-            user.username = request.form["username"].strip()
-            user.email = request.form["email"].strip()
-            user.first_name = request.form["first_name"].strip()
-            user.last_name = request.form["last_name"].strip()
-            user.password = generate_password_hash(request.form["password"].strip())
+            user.username = request.form.get("username", user.username).strip()
+            user.email = request.form.get("email", user.email).strip()
+            user.first_name = request.form.get("first_name", user.first_name).strip()
+            user.last_name = request.form.get("last_name", user.last_name).strip()
+            user.password = generate_password_hash(request.form.get("password", user.password).strip())
 
+            if user.avatar and not request.files:
+                ic("no files submitted in form, but avatar in db")
+                db.session.delete(user.avatar)
+                
+                delete_file(user.avatar.path)
+            
+            # UPDATING USER AVATAR
             if request.files:
                 avatar_file = request.files["avatar"]
-                avatar_path = path.join(current_app.config["UPLOAD_FOLDER"], secure_filename(avatar_file.filename))
+                avatar_path = generate_file_path(avatar_file.filename, "avatar")
 
-                avatar = Avatar(
-                    path = avatar_path,
-                    user_id = user.id
-                )
+                if user.avatar and avatar_path != user.avatar.path:
+                    delete_file(user.avatar.path)
+                
+                user.avatar = Avatar(path = avatar_path)
+                save_file(avatar_file, avatar_path)          
 
-                avatar_file.save(path.join(current_app.root_path, avatar_path))
-                db.session.add(avatar)
-            
             db.session.commit()
-
+            
             if user.verification_key and user.verified_at == None:
                 email_template = render_template("email/verification.html", client_url=environ["CLIENT_URL"], verification_key=user.verification_key)
                 send_email(user.email, "Almost there: Verify your account!", email_template)
@@ -91,9 +94,14 @@ def auth_user(id):
             return make_response(user.to_dict(auth=True), 200)
         except Exception as ex:
             db.session.rollback()
-            for arg in ex.args: error = arg
+            ic(ex)
 
-            return make_response({"user": user.to_dict(auth=True), "error": error}, 400)
+            for arg in ex.args:
+                error = arg
+                if "Duplicate" and "email" in arg:
+                    error = {"email": "Email in use; please choose another."}
+
+            return make_response({"error": error}, 400)
     
     if request.method == "DELETE":
         try:

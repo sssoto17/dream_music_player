@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { SignupForm } from "../../create-account/[[...lang]]/form.client";
 import { getAuthUser } from "@/features/auth/dal";
 import { getLang } from "@/lib/lang";
+import { getAvatarSrc } from "@/lib/utils";
 
 export default function AccountSettings({ params }) {
 	return (
@@ -19,6 +20,8 @@ async function UserSettings({ p }) {
 	const user = await getAuthUser();
 	const language = await getLang(p);
 
+	const src = getAvatarSrc(user.avatar);
+
 	return (
 		<article className="px-16 py-12">
 			<header className="mb-8">
@@ -29,7 +32,8 @@ async function UserSettings({ p }) {
 			<SignupForm
 				{...user}
 				lang={language}
-				avatar={user.avatar && `${process.env.SERVER}/${user.avatar}`}
+				avatar={user.avatar && src}
+				isSignUp={false}
 			/>
 		</article>
 	);

@@ -31,10 +31,12 @@ async function isSignUp(key) {
 	const { v } = await key;
 
 	if (!v) redirect("/");
+
+	return true;
 }
 
 async function Test({ p, q }) {
-	await isSignUp(q);
+	const signUp = await isSignUp(q);
 	const user = await getAuthUser();
 
 	const language = await getLang(p);
@@ -50,7 +52,7 @@ async function Test({ p, q }) {
 					Ready to jam out? Fill out your information and get started!
 				</p>
 			</header>
-			<SignupForm {...user} lang={language} />
+			<SignupForm {...user} lang={language} isSignUp={signUp} />
 		</article>
 	);
 }

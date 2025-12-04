@@ -33,7 +33,6 @@ export default function AvatarPicker({
 }
 
 function AvatarPickerIcon({ hasPreview }) {
-	// console.log(hasPreview);
 	return (
 		<div className="relative *:transition-all *:duration-75">
 			{hasPreview && !hasPreview.includes("undefined") ? (

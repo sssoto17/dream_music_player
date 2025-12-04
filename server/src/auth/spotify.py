@@ -75,10 +75,11 @@ def spotify_callback():
 
             user = post(url_for("api.users.users", _external=True), data=payload).json()
 
-            if user["error"]:
-                ic("user verified")
-                url = f"{client_url}/login?exists=1"
-                return redirect(url)
+            ic(user)
+            # if user["error"]:
+            #     ic("user exists")
+            #     url = f"{client_url}/login?exists=1"
+            #     return redirect(url)
 
             url = f"{client_url}/auth/signup?id={user["id"]}&key={user["verification_key"]}&token={token["access_token"]}"
             return redirect(url)

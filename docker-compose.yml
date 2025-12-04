@@ -35,6 +35,7 @@ services:
                   path: ./server/src
                   target: /app/src
                   initial_sync: true
+                  ignore: static/uploads/
                 - action: sync+restart
                   path: ./server/src/models.py
                   target: /app/src/models.py
@@ -46,6 +47,7 @@ services:
         volumes:
             - ./server/migrations:/app/migrations
             - ./server/languages:/app/languages
+            - ./server/src/static/uploads:/app/src/static/uploads
         ports:
             - 5000:5000
         networks:

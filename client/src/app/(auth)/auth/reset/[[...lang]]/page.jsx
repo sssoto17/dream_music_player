@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { verifySession } from "@/features/auth/session";
 import Link from "next/link";
+import { ResetAccount } from "@/app/(auth)/actions";
 
 export default function Page({ params, searchParams }) {
 	return (
@@ -25,6 +26,7 @@ async function Content({ p, q }) {
 
 	if (!r) redirect("/login"); // should redirect to error page
 
+	const submit = ResetAccount.bind(null, r);
 	return (
 		<article className="px-16 py-12 grid content-start">
 			<header>
@@ -32,7 +34,7 @@ async function Content({ p, q }) {
 					Reset your password
 				</h1>
 			</header>
-			<form action="">
+			<form action={submit}>
 				<label
 					className="grid gap-y-1 py-1.5 font-medium text-slate-800"
 					htmlFor="password"

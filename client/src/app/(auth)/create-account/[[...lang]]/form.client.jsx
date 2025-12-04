@@ -12,6 +12,7 @@ export function SignupForm({
 	last_name,
 	avatar,
 	lang,
+	isSignUp,
 }) {
 	const [preview, setPreview] = useState(avatar);
 	const [avatarFile, setAvatarFile] = useState(null);
@@ -25,7 +26,7 @@ export function SignupForm({
 		},
 	};
 	const [state, submit, isPending] = useActionState(
-		UpdateAccount.bind(null, avatarFile),
+		UpdateAccount.bind(null, avatarFile, isSignUp),
 		initState
 	);
 
@@ -102,21 +103,30 @@ export function SignupForm({
 			>
 				{lang.password_confirm}
 			</FormInput>
-			<div className="col-span-full grid grid-cols-2 gap-4 *:transition-all *:duration-75">
+			{isSignUp ? (
 				<button
 					disabled={isPending}
-					className="mt-8 py-3 px-5 cursor-pointer rounded-md bg-fuchsia-700 hover:bg-fuchsia-600 text-white font-semibold tracking-wider font-display"
+					className="col-span-full flex justify-center gap-8 items-center mt-8 py-3 px-5 cursor-pointer rounded-md bg-fuchsia-700 hover:bg-fuchsia-600 text-white font-semibold tracking-wider font-display"
 				>
-					Save changes
+					<span>Continue</span> <FaArrowRight />
 				</button>
-				<button
-					formAction={DeleteAccount}
-					disabled={isPending}
-					className="flex justify-center items-center mt-8 py-3 px-5 cursor-pointer rounded-md bg-slate-800 hover:bg-rose-700 text-white font-semibold tracking-wider font-display"
-				>
-					Delete account
-				</button>
-			</div>
+			) : (
+				<div className="col-span-full grid grid-cols-2 gap-4 *:transition-all *:duration-75">
+					<button
+						disabled={isPending}
+						className="mt-8 py-3 px-5 cursor-pointer rounded-md bg-fuchsia-700 hover:bg-fuchsia-600 text-white font-semibold tracking-wider font-display"
+					>
+						Save changes
+					</button>
+					<button
+						formAction={DeleteAccount}
+						disabled={isPending}
+						className="flex justify-center items-center mt-8 py-3 px-5 cursor-pointer rounded-md bg-slate-800 hover:bg-rose-700 text-white font-semibold tracking-wider font-display"
+					>
+						Delete account
+					</button>
+				</div>
+			)}
 		</form>
 	);
 }

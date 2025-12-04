@@ -1,5 +1,6 @@
 import { verifySession } from "../auth/session";
 import { redirect } from "next/navigation";
+import { verifyUser } from "../db/users";
 
 const { AUTH_BASE: auth_url } = process.env;
 
@@ -25,11 +26,27 @@ export async function getAuthUser() {
 }
 
 export async function updateAuthUser(data) {
+	let id;
+	const key = data.get("r_key");
 	const { isAuth, userID } = await verifySession();
 
-	if (!isAuth) redirect("/login");
+	if (!isAuth && !key) redirect("/login");
 
-	return await fetch(user_url(userID), {
+	if (isAuth) {
+		id = userID;
+	}
+
+	if (key) {
+		const user = await verifyUser(key);
+
+		id = user?.id;
+	}
+
+	if (!id) return { error: "Password reset has expired." };
+
+	const url = user_url(id);
+
+	return await fetch(url, {
 		method: "PATCH",
 		body: data,
 	}).then((res) => res.json());

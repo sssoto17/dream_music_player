@@ -17,6 +17,10 @@ export function formatTrackProgress(duration, position) {
 	return Math.round((position / duration) * 100);
 }
 
+export function getAvatarSrc(path) {
+	return `${process.env.SERVER}/${path}`;
+}
+
 // GENERATORS
 
 export function genBase64() {
