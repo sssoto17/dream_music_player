@@ -32,7 +32,7 @@ async function UserProfile() {
 					<Link href="/auth/signout">Sign out</Link>
 				</li>
 			</ul>
-			{src && (
+			{user?.avatar && (
 				<Image src={src} alt="User avatar" width={400} height={500} />
 			)}
 		</section>

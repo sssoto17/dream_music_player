@@ -141,6 +141,7 @@ export async function ResetAccount(key, formData) {
 	try {
 		formData.append("r_key", key);
 
+		// NOTE: this method deletes the user avatar! Create separate function
 		const res = await updateAuthUser(formData, key);
 
 		if (res?.error) {
