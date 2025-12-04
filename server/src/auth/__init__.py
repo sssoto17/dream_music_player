@@ -46,7 +46,6 @@ def reset_user(email):
         if user.verification_key:
             email_template = render_template("email/password_reset.html", client_url=environ["CLIENT_URL"], verification_key=user.verification_key)
             send_email(user.email, "Reset your password", email_template) 
-
         
         return make_response({"status": "Password reset initiated."}, 200)
     except Exception as ex:
@@ -114,3 +113,24 @@ def auth_user(id):
             for arg in ex.args: error = arg
 
             return make_response({"user": user, "error": error}, 400)
+
+@app.route("/verify/<string:key>")
+@app.patch("/reset/<string:key>")
+def verify_user(key):
+    try:
+        q = select(User).where(User.verification_key == validate_verification_key(key))
+        user = db.session.scalar(q)
+
+        if not user: raise Exception("Invalid key.")
+
+        if user.verified_at:
+            user.password = generate_password_hash(request.form.get("password", user.password).strip())
+        else:
+            user.verified_at = datetime.now()
+
+        user.verification_key = ""
+        db.session.commit()
+
+        return make_response(user.to_dict(), 200)
+    except Exception as ex:
+        return make_response({"error": str(ex)}, 400)

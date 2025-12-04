@@ -1,10 +1,11 @@
 "use server";
 import { createSession } from "@/features/auth/session";
-import { getUsers, resetUser } from "@/features/db/users";
+import { resetUser } from "@/features/db/users";
 import {
 	authenticateUser,
 	updateAuthUser,
 	deleteAuthUser,
+	resetAuthUser,
 } from "@/features/auth/dal";
 import { validateData } from "@/features/db/schema";
 
@@ -44,8 +45,6 @@ export async function UpdateAccount(avatar, isSignUp, prev, formData) {
 			error: error,
 		};
 	}
-
-	console.log(avatar);
 
 	formData.set("avatar", avatar);
 
@@ -139,10 +138,7 @@ export async function ResetAccount(key, formData) {
 	}
 
 	try {
-		formData.append("r_key", key);
-
-		// NOTE: this method deletes the user avatar! Create separate function
-		const res = await updateAuthUser(formData, key);
+		const res = await resetAuthUser(formData, key);
 
 		if (res?.error) {
 			return {

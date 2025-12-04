@@ -69,23 +69,6 @@ def user(id = None, username = None, key = None):
         return make_response(user.to_dict(), 200)
     except Exception as ex:
         return make_response({"error": str(ex)}, 400)
-    
-@app.route("/users/verify/<string:key>")
-def verify_user(key):
-    try:
-        q = select(User).where(User.verification_key == validate_verification_key(key))
-        user = db.session.scalar(q)
-
-        if not user: raise Exception("Invalid key.")
-
-        if not user.verified_at: user.verified_at = datetime.now()
-        user.verification_key = ""
-
-        db.session.commit()
-
-        return make_response(user.to_dict(), 200)
-    except Exception as ex:
-        return make_response({"error": str(ex)}, 400)
 
 @app.get("/users/reset/<string:email>")
 def reset_user(email):

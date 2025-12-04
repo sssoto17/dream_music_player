@@ -2,7 +2,7 @@ import { verifySession } from "../auth/session";
 import { redirect } from "next/navigation";
 import { verifyUser } from "../db/users";
 
-const { AUTH_BASE: auth_url } = process.env;
+const { AUTH_BASE: auth_url, API_BASE: api_url } = process.env;
 
 const user_url = (id) => {
 	return `${auth_url}/me/${id}`;
@@ -26,25 +26,22 @@ export async function getAuthUser() {
 }
 
 export async function updateAuthUser(data) {
-	let id;
-	const key = data.get("r_key");
 	const { isAuth, userID } = await verifySession();
 
-	if (!isAuth && !key) redirect("/login");
+	if (!isAuth) redirect("/login");
 
-	if (isAuth) {
-		id = userID;
-	}
+	const url = user_url(userID);
 
-	if (key) {
-		const user = await verifyUser(key);
+	return await fetch(url, {
+		method: "PATCH",
+		body: data,
+	}).then((res) => res.json());
+}
 
-		id = user?.id;
-	}
+export async function resetAuthUser(data, key) {
+	if (!key) return { error: "Password reset has expired." };
 
-	if (!id) return { error: "Password reset has expired." };
-
-	const url = user_url(id);
+	const url = `${auth_url}/reset/${key}`;
 
 	return await fetch(url, {
 		method: "PATCH",
