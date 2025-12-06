@@ -182,5 +182,5 @@ export async function DeleteAccount() {
 
 	// display a toast with a success message, followed by a redirect to home after a couple sec
 	revalidatePath("/");
-	redirect("/auth/signout"); // redirect to successful deletion page which will automatically redirect to homepage after three seconds
+	redirect("/"); // redirect to successful deletion page which will automatically redirect to homepage after three seconds
 }
