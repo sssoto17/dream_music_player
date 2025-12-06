@@ -5,9 +5,8 @@ import { LogIn, ResetAccountRequest } from "../actions";
 import Form, { FormInput } from "@/components/form/Form";
 
 export function SignIn({ dict }) {
-	const [state, submit, isPending] = useActionState(LogIn, {});
+	const [state, submit, isPending] = useActionState(LogIn);
 
-	console.log(dict);
 	return (
 		<Form>
 			<FormInput

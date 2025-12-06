@@ -1,8 +1,20 @@
 import { redirect } from "next/navigation";
 import { deleteSession } from "@/features/auth/session";
 
-export async function GET() {
-  await deleteSession();
+const allowedLocales = ["en", "dk"];
 
-  redirect("/login");
+const getLocale = (pathname) => {
+	return allowedLocales.find((locale) => pathname.startsWith(`/${locale}`));
+};
+
+export async function GET(req) {
+	const { pathname } = req.nextUrl;
+
+	const locale = getLocale(pathname);
+
+	await deleteSession();
+
+	if (!locale) redirect("/login");
+
+	redirect(`/${locale}/login`);
 }

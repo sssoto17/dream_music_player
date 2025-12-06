@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getAvatarSrc } from "@/lib/utils";
+import { getAvatarSrc, getLocalizedHref } from "@/lib/utils";
 import { getUsers } from "@/features/db/users";
 import { cacheLife, cacheTag } from "next/cache";
 
-export default async function User() {
+export default async function User({ params }) {
 	"use cache";
+	const { locale } = await params;
 	cacheLife("default");
 	cacheTag("user");
 
@@ -18,10 +19,22 @@ export default async function User() {
 				<h3>Hello {user.username}</h3>
 				<ul>
 					<li>
-						<Link href="/profile/settings">Account settings</Link>
+						<Link
+							href={getLocalizedHref(
+								locale,
+								"/dashboard/settings"
+							)}
+						>
+							Account settings
+						</Link>
 					</li>
 					<li>
-						<Link href="/auth/signout">Sign out</Link>
+						<Link
+							replace
+							href={getLocalizedHref(locale, "/auth/signout")}
+						>
+							Sign out
+						</Link>
 					</li>
 				</ul>
 				{user?.avatar && (

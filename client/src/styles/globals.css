@@ -1,48 +1,57 @@
 @import "tailwindcss";
+@import "flag-icons/css/flag-icons.min.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #ffffff;
+	--foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+	}
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-display: var(--font-manrope);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-display: var(--font-manrope);
 }
 
 @theme {
-  --spacing-content: 1200px;
-  /* COLOR */
+	--spacing-content: 1200px;
+	/* COLOR */
 
-  /* TYPE */
+	/* TYPE */
 }
 
 body {
-  font-family: Seravek, "Gill Sans Nova", Ubuntu, Calibri, "DejaVu Sans",
-    source-sans-pro, sans-serif;
-  font-weight: 300;
+	min-height: 100svh;
+	font-family: Seravek, "Gill Sans Nova", Ubuntu, Calibri, "DejaVu Sans",
+		source-sans-pro, sans-serif;
+	font-weight: 300;
+
+	display: grid;
+	grid-template-rows: [header] auto [content] 1fr [footer] auto;
 }
 
 @keyframes playbackProgress {
-  from {
-    width: var(--playback-progress, 0%);
-  }
-  to {
-    width: 100%;
-  }
+	from {
+		width: var(--playback-progress, 0%);
+	}
+	to {
+		width: 100%;
+	}
 }
 
 @utility animate-playback-* {
-  animation-name: "playbackProgress";
-  animation-iteration-count: --value(integer, "infinite");
-  animation-duration: var(--playback-duration, 1s);
-  animation-play-state: var(--playback-state);
+	animation-name: "playbackProgress";
+	animation-iteration-count: --value(integer, "infinite");
+	animation-duration: var(--playback-duration, 1s);
+	animation-play-state: var(--playback-state);
+}
+
+.fi {
+	background-size: cover;
 }

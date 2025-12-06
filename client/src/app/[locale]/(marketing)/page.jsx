@@ -5,12 +5,12 @@ import Image from "next/image";
 import { getAvatarSrc } from "@/lib/utils";
 
 export default async function Home({ params }) {
-	const { locale } = await params;
+	const { locale = "EN" } = await params;
 
 	// const testAlbum = `/album/${process.env.SPOTIFY_TEST_ALBUM}`;
 
 	return (
-		<main className="h-screen">
+		<main className="h-full">
 			{/* <Link className="block" href={getLocalizedHref(locale, testAlbum)}>
 				Go to album
 			</Link> */}

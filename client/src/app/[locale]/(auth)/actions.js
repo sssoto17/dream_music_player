@@ -34,7 +34,7 @@ export async function LogIn(prev, formData) {
 			user: data,
 		};
 
-	redirect("/profile");
+	redirect("/dashboard");
 }
 
 export async function UpdateAccount(avatar, isSignUp, prev, formData) {

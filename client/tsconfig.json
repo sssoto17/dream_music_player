@@ -18,8 +18,11 @@
 				"name": "next"
 			}
 		],
+		"baseUrl": "src/",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./*"],
+			"@/components/*": ["components/*"],
+			"@/styles/*": ["styles/*"]
 		}
 	},
 	"include": [
@@ -31,8 +34,6 @@
 		".next/types/**/*.ts",
 		".next/dev/types/**/*.ts",
 		"**/*.mts",
-		"src/app/[locale]/layout.jsx",
-		"src/app/[locale]/(marketing)/page.jsx",
 		"next.config.js"
 	],
 	"exclude": ["node_modules"]

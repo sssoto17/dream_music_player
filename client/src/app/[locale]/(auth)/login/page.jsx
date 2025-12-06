@@ -8,8 +8,6 @@ export default async function Page({ params, searchParams }) {
 
 	const lang = await getLang(locale);
 
-	console.log("current:", locale);
-
 	return (
 		<article className="px-16 py-12 grid grid-rows-[auto_1fr_auto] content-start">
 			<header className="mb-8">
