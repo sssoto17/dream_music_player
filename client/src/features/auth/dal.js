@@ -8,19 +8,20 @@ const user_url = (id) => {
 	return `${auth_url}/me/${id}`;
 };
 
-export async function authenticateUser(userCredentials) {
+export async function authenticateUser(credentials) {
 	const url = `${auth_url}/login`;
 	const payload = {
 		method: "POST",
-		body: userCredentials,
+		body: credentials,
 	};
+
 	return await fetch(url, payload).then((res) => res.json());
 }
 
 export async function getAuthUser() {
-	const { isAuth, userID } = await verifySession();
+	// const { isAuth, userID } = await verifySession();
 
-	if (!isAuth) redirect("/login");
+	// if (!isAuth) redirect("/login");
 
 	return await fetch(user_url(userID)).then((res) => res.json());
 }

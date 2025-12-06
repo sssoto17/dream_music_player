@@ -1,9 +1,9 @@
 from . import db
 
-from sqlalchemy import String, ForeignKey, PrimaryKeyConstraint, UniqueConstraint, inspect
+from sqlalchemy import String, Enum, ForeignKey, ForeignKeyConstraint, PrimaryKeyConstraint, UniqueConstraint, inspect
 from sqlalchemy.orm import Mapped, declared_attr, mapped_column, relationship
 
-from typing import Optional, List
+from typing import Optional, List, Literal, get_args
 from datetime import datetime
 
 # GLOBAL COLUMNS
@@ -30,6 +30,7 @@ class UserFKMixin:
         bp = getattr(cls, "__user_back_populates__", None)
         return relationship(back_populates=bp)
      
+Roles = Literal["admin", "user"]
 
 # TABLES
 class User(db.Model, IDMixin, TimeStampMixin):
@@ -44,6 +45,9 @@ class User(db.Model, IDMixin, TimeStampMixin):
     verification_key: Mapped[Optional[str]] = mapped_column(String(32))
     verified_at: Mapped[Optional[datetime]] = mapped_column(default=None)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(default=None, sort_order=3)
+    role: Mapped[Roles] = mapped_column(Enum(*get_args(Roles), name="role_enum",
+        create_constraint=True,
+        validate_strings=True,))
 
     token: Mapped["Refresh_Token"] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     sessions: Mapped[List["Session"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
@@ -87,21 +91,16 @@ class Avatar(db.Model, IDMixin, UserFKMixin):
     __user_fk_ondelete__ = "SET NULL"
 
     path: Mapped[str] = mapped_column(String(200))
-class Session(db.Model, UserFKMixin, TimeStampMixin):
+
+class Session(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
     __tablename__ = "sessions"
-    __table_args__ = (
-         PrimaryKeyConstraint("user_id", "token_id", name="id"),
-    )
     __user_back_populates__ = "sessions"
 
-    token_id: Mapped[int] = mapped_column(ForeignKey("tokens.id", ondelete="CASCADE"))
-    session_id: Mapped[str] = mapped_column(String(100), unique=True)
+    token_id: Mapped[int] = mapped_column(ForeignKey("tokens.id"))
+    session_token: Mapped[str] = mapped_column(String(440), unique=True)
     expires_at: Mapped[datetime] = mapped_column(sort_order=2)
     
     token: Mapped["Refresh_Token"] = relationship(back_populates="session")
-
-    # class Playlist(db.Model, IDMixin):
-#      pass
 
 class Blocked_User(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
     __tablename__ = "users_blocked"

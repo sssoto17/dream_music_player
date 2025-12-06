@@ -9,6 +9,7 @@ from smtplib import SMTP
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from werkzeug.utils import secure_filename
+from cryptography.fernet import Fernet
 
 def ic(log):
     icecream.configureOutput(prefix=f'LOG || ', includeContext=True)
@@ -18,6 +19,15 @@ def b64(str):
     auth_str = str.encode("ascii")
     auth_b64 = b64encode(auth_str)
     return auth_b64.decode("ascii")
+
+key = Fernet.generate_key()
+f = Fernet(key)
+
+def encrypt(str):
+    return f.encrypt(str.encode())
+def decrypt(str):
+    token = f.decrypt(str)
+    return token.decode()
 
 def expires_at(s):
     now = datetime.now()

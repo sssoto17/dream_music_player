@@ -5,12 +5,32 @@ from json import dumps, load
 from csv import DictReader
 from io import StringIO
 
+from sqlalchemy import select
+
 from ..utils import ic
+from ..db import db
+from ..db.models import User, Blocked_User
 
 app = Blueprint('admin', __name__, url_prefix='/admin')
 
 sheet_key = "1FQLwxraGkM-SNsLfUbir3BfUnHRQZgXSHuvB0qF1zIg"
 formSheet = f"https://docs.google.com/spreadsheets/d/{sheet_key}/export?format=csv&id={sheet_key}"
+
+@app.route("/restrict/<int:id>")
+def block_user(id):
+    q = select(Blocked_User).where(Blocked_User.id == id)
+    user = db.session.scalar(q)
+    try:
+        if not user:
+            user = Blocked_User(user_id = id)
+            db.session.add(user)
+
+        db.session.commit()
+
+        return make_response({"status": f"User updated."}, 200)
+    except Exception as ex:
+        ic(ex)
+        return make_response({"error": str(ex)}, 400)
 
 @app.route("/lang-support")
 def get_languages():

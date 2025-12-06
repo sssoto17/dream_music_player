@@ -64,11 +64,10 @@ def access_token(id):
         }
 
         token = post(url, params=payload, headers=headers).json()
-        ic(token)
 
         if not token["access_token"]: raise Exception(str(token["error"]))
 
-        return make_response({"access_token": token["access_token"]}, 200)
+        return make_response(token, 200)
     except Exception as ex:
         ic(ex)
         return make_response({"error": str(ex)}, 400)

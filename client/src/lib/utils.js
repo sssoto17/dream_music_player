@@ -17,6 +17,13 @@ export function formatTrackProgress(duration, position) {
 	return Math.round((position / duration) * 100);
 }
 
+export function getLocalizedHref(locale, href) {
+	if (locale == "en") {
+		return href;
+	}
+	return `/${locale}${href}`;
+}
+
 export function getAvatarSrc(path) {
 	return `${process.env.SERVER}/${path}`;
 }

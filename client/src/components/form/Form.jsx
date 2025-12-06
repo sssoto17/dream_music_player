@@ -1,17 +1,18 @@
 // create separate react hook to handle form submission logic
-import Form from "next/form";
+import NextForm from "next/form";
 
-export default function SubmissionForm({ children }) {
+export default function Form({ action, children }) {
 	return (
-		<Form action="" className="grid grid-cols-6 gap-4 items-end">
+		<NextForm action={action} className="grid grid-cols-6 gap-4 items-end">
 			{children}
-		</Form>
+		</NextForm>
 	);
 }
 
 export function FormInput({
 	name,
 	value,
+	placeholder,
 	type,
 	error,
 	disabled,
@@ -44,6 +45,7 @@ export function FormInput({
 				type={type || "text"}
 				defaultValue={value}
 				disabled={disabled}
+				placeholder={placeholder}
 			/>
 		</div>
 	);

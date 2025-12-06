@@ -10,16 +10,31 @@ import {
 import { validateData } from "@/features/db/schema";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 
-export async function LogIn(formData) {
-	const user = await authenticateUser(formData);
+export async function LogIn(prev, formData) {
+	const data = {
+		email: formData.get("email"),
+		password: formData.get("password"),
+	};
 
-	if (user?.error) return user.error;
+	const userSession = await authenticateUser(formData);
 
-	await createSession(user);
+	if (userSession?.error)
+		return {
+			user: data,
+			error: userSession.error,
+		};
 
-	redirect("/dashboard");
+	const { isAuth } = await createSession(userSession);
+
+	if (!isAuth)
+		return {
+			...prev,
+			user: data,
+		};
+
+	redirect("/profile");
 }
 
 export async function UpdateAccount(avatar, isSignUp, prev, formData) {
@@ -71,6 +86,8 @@ export async function UpdateAccount(avatar, isSignUp, prev, formData) {
 	if (isSignUp) {
 		redirect("/dashboard");
 	}
+
+	updateTag("user");
 	return {
 		user: user,
 	};

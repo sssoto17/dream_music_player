@@ -33,7 +33,8 @@ def users():
                 password = generate_password_hash(request.form["password"]),
                 first_name = request.form["first_name"],
                 last_name = request.form["last_name"],
-                verification_key = uuid4().hex
+                verification_key = uuid4().hex,
+                role = "user"
             )
 
             db.session.add(user)
@@ -57,7 +58,7 @@ def users():
     
 @app.route("/users/<int:id>")
 @app.route("/users/<string:username>")
-def user(id = None, username = None, key = None):
+def user(id = None, username = None):
     try:
         if id:
             q = select(User).where(User.id == id)

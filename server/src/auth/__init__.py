@@ -1,17 +1,20 @@
 from os import environ
-from flask import Blueprint, request, render_template, make_response
+from flask import Blueprint, request, url_for, render_template, make_response
 from sqlalchemy import select
 from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
+from requests import get
+from datetime import datetime
 
 from ..db import db
 from ..db.models import *
-from ..utils import ic, generate_file_path, save_file, delete_file, send_email
+from ..utils import ic, expires_at, encrypt, decrypt, generate_file_path, save_file, delete_file, send_email
 from .validation import *
 
-from . import spotify, token
+from . import session, spotify, token
 
 app = Blueprint('auth', __name__, url_prefix='/auth')
+app.register_blueprint(session.app)
 app.register_blueprint(spotify.app)
 app.register_blueprint(token.app)
 
@@ -24,10 +27,26 @@ def authenticate_user():
         q = select(User).where(User.email == email)
         user = db.session.scalar(q)
 
-        if not user: raise Exception("User doesn't exist.")
-        if not check_password_hash(user.password, password): raise Exception("Invalid password.")
-        
-        return make_response(user.to_dict(auth=True), 200)
+        if not user or not check_password_hash(user.password, password):
+            raise Exception("Incorrect email or password.")
+
+        # GET SPOTIFY ACCESS TOKEN
+        token = get(url_for("auth.token.access_token", _external=True, id = user.id)).json()
+        session_token = encrypt(token["access_token"])
+
+        # CREATE SESSION
+        session = Session(
+            user_id = user.id,
+            token_id = user.token.id,
+            session_token = session_token,
+            expires_at = expires_at(token["expires_in"])
+        )
+
+        ic(session)
+        db.session.add(session)
+        db.session.commit()
+
+        return make_response({"session": session.session_token, "expires": session.expires_at}, 200)
     except Exception as ex:
             ic(ex)
             return make_response({"error": str(ex)}, 400)
@@ -56,6 +75,8 @@ def reset_user(email):
 def auth_user(id):
     q = select(User).where(User.id == id)
     user = db.session.scalar(q)
+
+    ic(user)
 
     if request.method == "GET": return make_response(user.to_dict(auth=True), 200)
     

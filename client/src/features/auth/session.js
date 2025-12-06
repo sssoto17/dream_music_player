@@ -1,21 +1,20 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { getAccessToken } from "../db/tokens";
 
-export async function createSession({ id, username, access_token: token }) {
+export async function createSession({ session, expires_at }) {
 	const store = await cookies();
-	const access_token = token || (await getAccessToken(id));
 
-	if (!access_token || access_token?.error) return { isAuth: false };
+	if (!session) return { isAuth: false };
 
-	store.set("user_id", id);
-	store.set("username", username);
-	store.set("access_token", access_token);
-	// perhaps set a time limit on it so it expires?
-	// or handle expiration and refreshing purely in python?
-	// if so, access_token needs to be checked with every API call to backend, so mismatch can trigger a refresh
+	store.set("session", session, {
+		httpOnly: true,
+		secure: true,
+		expires: expires_at,
+		sameSite: "lax",
+		path: "/",
+	});
 
-	return { isAuth: true, userID: id, access_token: access_token };
+	return { isAuth: true };
 }
 
 export async function updateSession() {
@@ -52,8 +51,5 @@ export const verifySession = async () => {
 };
 
 export async function deleteSession() {
-	const store = await cookies();
-	store.delete("user_id");
-	store.delete("username");
-	store.delete("access_token");
+	(await cookies()).delete("session");
 }
