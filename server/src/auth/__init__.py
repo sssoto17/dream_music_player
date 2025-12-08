@@ -1,22 +1,21 @@
 from os import environ
-from flask import Blueprint, request, url_for, render_template, make_response
+from flask import Blueprint, request, render_template, make_response
 from sqlalchemy import select
 from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
-from requests import get
-from datetime import datetime
+from datetime import datetime, timezone
 
 from ..db import db
 from ..db.models import *
-from ..utils import ic, expires_at, encrypt, decrypt, generate_file_path, save_file, delete_file, send_email
-from .validation import *
+from ..utils import ic, expires_at, generate_file_path, save_file, delete_file, send_email
+from .validation import validate_verification_key
 
 from . import session, spotify, token
 
 app = Blueprint('auth', __name__, url_prefix='/auth')
 app.register_blueprint(session.app)
 app.register_blueprint(spotify.app)
-app.register_blueprint(token.app)
+# app.register_blueprint(token.app)
 
 @app.post("/login")
 def authenticate_user():
@@ -30,26 +29,26 @@ def authenticate_user():
         if not user or not check_password_hash(user.password, password):
             raise Exception("Incorrect email or password.")
 
-        # GET SPOTIFY ACCESS TOKEN
-        token = get(url_for("auth.token.access_token", _external=True, id = user.id)).json()
-        session_token = encrypt(token["access_token"])
+        token = spotify.get_refreshed_token(user.token.refresh_token)
+
+
+        if not token["access_token"]: raise Exception(token)
 
         # CREATE SESSION
-        session = Session(
+        user_session = UserSession(
             user_id = user.id,
             token_id = user.token.id,
-            session_token = session_token,
+            access_token = token["access_token"],
             expires_at = expires_at(token["expires_in"])
-        )
+            )
 
-        ic(session)
-        db.session.add(session)
+        db.session.add(user_session)
         db.session.commit()
 
-        return make_response({"session": session.session_token, "expires": session.expires_at}, 200)
+        return make_response(user_session.to_dict(), 200)
     except Exception as ex:
-            ic(ex)
-            return make_response({"error": str(ex)}, 400)
+        ic(ex)
+        return make_response(str(ex), 400)
 
 @app.get("/reset/<string:email>")
 def reset_user(email):
@@ -147,7 +146,7 @@ def verify_user(key):
         if user.verified_at:
             user.password = generate_password_hash(request.form.get("password", user.password).strip())
         else:
-            user.verified_at = datetime.now()
+            user.verified_at = datetime.now(timezone.utc)
 
         user.verification_key = ""
         db.session.commit()

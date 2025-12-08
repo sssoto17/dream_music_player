@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { SignIn } from "./form.client";
 import { getLang } from "@/lib/lang";
+import { getLocalizedHref } from "@/lib/utils";
 
-export default async function Page({ params, searchParams }) {
+const { AUTH_BASE_URL: auth_url } = process.env;
+
+export default async function Page({ params }) {
 	const { locale } = await params;
 	// const { exists } = await searchParams;
 
@@ -19,7 +22,7 @@ export default async function Page({ params, searchParams }) {
 			<div>
 				<SignIn dict={lang} />
 				<Link
-					href={`/${locale}/login/reset`}
+					href={getLocalizedHref(locale, "/login/reset")}
 					className="inline-block my-2 text-slate-500 hover:underline hover:opacity-70 transition-all duration-75"
 				>
 					Forgot password?
@@ -30,7 +33,7 @@ export default async function Page({ params, searchParams }) {
 					Don&apos;t have an account?
 				</p>
 				<Link
-					href={`${process.env.AUTH_BASE_URL}/authorize`}
+					href={`${auth_url}/authorize`}
 					className="text-center py-3 px-8 cursor-pointer rounded-md bg-slate-800 group-hover:bg-slate-700 text-white text-sm font-semibold uppercase font-display"
 				>
 					Register with Spotify

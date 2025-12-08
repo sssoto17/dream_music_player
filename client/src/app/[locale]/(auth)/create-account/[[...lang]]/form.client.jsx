@@ -2,7 +2,7 @@
 import { useState, useActionState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
 
-import AvatarPicker from "../../_components/AvatarPicker";
+import AvatarPicker from "../../../../../components/user/AvatarPicker";
 import { UpdateAccount, DeleteAccount } from "../../actions";
 import Form, { FormInput } from "@/components/form/Form";
 

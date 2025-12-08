@@ -1,5 +1,9 @@
 "use server";
-import { createSession } from "@/features/auth/session";
+import {
+	createSession,
+	deleteCookie,
+	deleteSession,
+} from "@/features/auth/session";
 import { resetUser } from "@/features/db/users";
 import {
 	authenticateUser,
@@ -10,32 +14,48 @@ import {
 import { validateData } from "@/features/db/schema";
 
 import { redirect } from "next/navigation";
-import { revalidatePath, updateTag } from "next/cache";
+import { revalidatePath, revalidateTag, updateTag } from "next/cache";
+import { getLocalizedHref } from "@/lib/utils";
 
-export async function LogIn(prev, formData) {
+export async function Login(locale, prev, formData) {
 	const data = {
 		email: formData.get("email"),
 		password: formData.get("password"),
 	};
 
-	const userSession = await authenticateUser(formData);
+	const session = await authenticateUser(formData);
 
-	if (userSession?.error)
-		return {
-			user: data,
-			error: userSession.error,
-		};
+	if (session?.error) return { ...prev, user: data, error: session.error };
 
-	const { isAuth } = await createSession(userSession);
+	const { isAuth } = await createSession(session);
 
-	if (!isAuth)
-		return {
-			...prev,
-			user: data,
-		};
+	if (!isAuth) return { ...prev, user: data };
 
-	redirect("/dashboard");
+	updateTag("user");
+	revalidatePath("/", "layout");
+	redirect(getLocalizedHref(locale, "/dashboard"));
 }
+
+export async function Logout(locale) {
+	await deleteCookie("refresh_token");
+	await deleteCookie("access_token");
+	await deleteCookie("user_id");
+
+	revalidatePath("/", "layout");
+	updateTag("user");
+
+	redirect(getLocalizedHref(locale, "/login"));
+}
+
+// export async function Logout(locale) {
+// 	const res = await deleteSession();
+// 	console.log("test logout", res);
+
+// 	if (!isAuth) {
+// 		revalidatePath("/", "layout");
+// 		redirect(getLocalizedHref(locale, "/login"));
+// 	}
+// }
 
 export async function UpdateAccount(avatar, isSignUp, prev, formData) {
 	const user = {
@@ -131,8 +151,6 @@ export async function UpdateAccountTest(avatar, { user }, formData) {
 
 export async function ResetAccountRequest(formData) {
 	const response = await resetUser(formData.get("email"));
-
-	console.log(response);
 
 	if (response.status) {
 		return {

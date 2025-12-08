@@ -3,7 +3,8 @@ from flask import current_app
 
 from icecream import ic as icecream
 from base64 import b64encode
-from datetime import datetime, timedelta
+from time import time
+from datetime import datetime, timedelta, timezone
 
 from smtplib import SMTP
 from email.mime.multipart import MIMEMultipart
@@ -20,19 +21,26 @@ def b64(str):
     auth_b64 = b64encode(auth_str)
     return auth_b64.decode("ascii")
 
-key = Fernet.generate_key()
+key = environ["SECRET_KEY"]
 f = Fernet(key)
 
 def encrypt(str):
     return f.encrypt(str.encode())
+
 def decrypt(str):
     token = f.decrypt(str)
     return token.decode()
 
-def expires_at(s):
-    now = datetime.now()
-    expiration = now + timedelta(0,s)
-    return expiration
+def to_utc(dt: datetime) -> datetime:
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+def expires_at(s: int) -> datetime:
+    return datetime.now(timezone.utc) + timedelta(seconds=s)
+
+def has_expired(expiration: datetime) -> bool:
+    return to_utc(expiration) < datetime.now(timezone.utc)
 
 def generate_file_path(filename, folder = ""):
     return path.join(current_app.config["UPLOAD_FOLDER"], folder, secure_filename(filename))

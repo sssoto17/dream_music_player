@@ -1,9 +1,8 @@
 import { Manrope } from "next/font/google";
 import "@/styles/globals.css";
-import Link from "next/link";
-import { getLocalizedHref } from "@/lib/utils";
-import LocaleSwitch from "@/components/global/LocaleSwitch";
+import Header from "@/components/global/Header";
 import ClientProviders from "@/components/global/ClientProviders";
+import SessionRefresh from "@/app/[locale]/(auth)/_components/SessionRefresh";
 
 const manrope = Manrope({
 	variable: "--font-manrope",
@@ -29,10 +28,11 @@ export default async function RootLayout({ children, params }) {
 	return (
 		<html lang="en">
 			<body
-				className={`${manrope.variable} min-h-screen`}
+				className={`${manrope.variable} bg-linear-to-b from-amber-50 to-fuchsia-100`}
 				suppressHydrationWarning
 			>
 				<ClientProviders>
+					<SessionRefresh />
 					<Header locale={locale} />
 					{children}
 					<Footer />
@@ -42,42 +42,10 @@ export default async function RootLayout({ children, params }) {
 	);
 }
 
-async function Header({ locale }) {
-	console.log(locale);
-	return (
-		<header className="max-w-screen py-4 bg-fuchsia-600 text-white text-xl font-display">
-			<nav className="max-w-content mx-auto px-8 flex justify-between items-end">
-				<h1 className="text-3xl font-bold">
-					<Link
-						className="block"
-						href={getLocalizedHref(locale, "/")}
-					>
-						Home
-					</Link>
-				</h1>
-
-				<div className="flex gap-4 items-center">
-					<ul className="font-semibold">
-						<li>
-							<Link
-								className="block"
-								href={getLocalizedHref(locale, "/login")}
-							>
-								Login
-							</Link>
-						</li>
-					</ul>
-					<LocaleSwitch active={locale} />
-				</div>
-			</nav>
-		</header>
-	);
-}
-
 function Footer() {
 	return (
-		<footer className="max-w-screen bg-fuchsia-100 text-slate-800 text-xl font-semibold font-display">
-			<p className="max-w-content mx-auto px-8">Footer</p>
+		<footer className="py-4 white/60 backdrop-blur-3xl text-slate-800 text-xl font-semibold font-display">
+			<p>Footer</p>
 		</footer>
 	);
 }

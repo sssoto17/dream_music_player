@@ -28,6 +28,10 @@ export function getAvatarSrc(path) {
 	return `${process.env.SERVER}/${path}`;
 }
 
+export function slugify(str) {
+	return str.replaceAll(" ", "-").toLowerCase();
+}
+
 // GENERATORS
 
 export function genBase64() {
@@ -51,3 +55,7 @@ export function isEmpty(obj) {
 
 	return !hasKeys.length;
 }
+
+export const getUserUrl = (id) => {
+	return `${auth_url}/me/${id}`;
+};

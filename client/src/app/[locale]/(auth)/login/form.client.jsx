@@ -1,11 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
-import { LogIn, ResetAccountRequest } from "../actions";
+import { Login, ResetAccountRequest } from "../actions";
 import Form, { FormInput } from "@/components/form/Form";
+import { useParams } from "next/navigation";
 
 export function SignIn({ dict }) {
-	const [state, submit, isPending] = useActionState(LogIn);
+	const { locale } = useParams();
+	const [state, submit, isPending] = useActionState(
+		Login.bind(null, locale),
+		{}
+	);
 
 	return (
 		<Form>

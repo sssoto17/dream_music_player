@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 
 export default function LocaleSwitch() {
 	const path = usePathname();
+	const { locale } = useParams();
 
 	const locales = [
 		{

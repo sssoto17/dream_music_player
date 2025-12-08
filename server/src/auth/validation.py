@@ -1,8 +1,6 @@
 from werkzeug.security import generate_password_hash
 import re
 
-# TODO: validate full name
-
 min = 2
 
 def validate_username(username):

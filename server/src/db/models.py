@@ -15,7 +15,7 @@ class IDMixin:
 class TimeStampMixin:
     @declared_attr
     def created_at(cls) -> Mapped[datetime]:
-        return mapped_column(default=datetime.now(), sort_order=2)
+        return mapped_column(default=datetime.now, sort_order=2)
 
 class UserFKMixin:
     @declared_attr
@@ -50,7 +50,7 @@ class User(db.Model, IDMixin, TimeStampMixin):
         validate_strings=True,))
 
     token: Mapped["Refresh_Token"] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
-    sessions: Mapped[List["Session"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
+    user_sessions: Mapped[List["UserSession"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     avatar: Mapped["Avatar"] = relationship(back_populates="user", cascade="save-update, merge, delete, delete-orphan", single_parent=True)
     is_blocked: Mapped["Blocked_User"] = relationship(back_populates="user", cascade="all, delete", single_parent=True)
     
@@ -77,8 +77,11 @@ class Refresh_Token(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
     __tablename__ = "tokens"
     __user_back_populates__ = "token"
 
-    refresh_token: Mapped[str] = mapped_column(String(160), unique=True)
-    session: Mapped["Session"] = relationship(back_populates="token")
+    refresh_token: Mapped[str] = mapped_column(String(260), unique=True)
+    user_session: Mapped["UserSession"] = relationship(back_populates="token",
+    cascade="all, delete-orphan",
+    uselist=False,
+    passive_deletes=True)
 
 class Avatar(db.Model, IDMixin, UserFKMixin):
     __tablename__ = "user_avatars"
@@ -92,15 +95,23 @@ class Avatar(db.Model, IDMixin, UserFKMixin):
 
     path: Mapped[str] = mapped_column(String(200))
 
-class Session(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
+class UserSession(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
     __tablename__ = "sessions"
-    __user_back_populates__ = "sessions"
+    __user_back_populates__ = "user_sessions"
 
     token_id: Mapped[int] = mapped_column(ForeignKey("tokens.id"))
-    session_token: Mapped[str] = mapped_column(String(440), unique=True)
+    access_token: Mapped[str] = mapped_column(String(440), unique=True)
     expires_at: Mapped[datetime] = mapped_column(sort_order=2)
     
-    token: Mapped["Refresh_Token"] = relationship(back_populates="session")
+    token: Mapped["Refresh_Token"] = relationship(back_populates="user_session")
+
+    def to_dict(self):
+        return {
+            "user_id": self.user_id,
+            "refresh_token": self.token.refresh_token,
+            "access_token": self.access_token,
+            "expires_at": self.expires_at,
+        }
 
 class Blocked_User(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
     __tablename__ = "users_blocked"

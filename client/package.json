@@ -1,5 +1,6 @@
 {
 	"name": "dream_music_player",
+	"type": "module",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {

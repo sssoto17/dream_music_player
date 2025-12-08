@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
-
-const allowedLocales = ["en", "dk"];
-
-const getLocale = (pathname) => {
-	return allowedLocales.find((locale) => pathname.startsWith(`/${locale}`));
-};
+import { getLocale } from "./lib/lang";
+import { getCookie } from "./features/auth/session";
 
 const authRoutes = ["/dashboard", "/create-account"];
 const pubRoutes = ["/login", "/auth/reset"];
@@ -21,7 +17,7 @@ export default async function proxy(req) {
 	const { pathname } = req.nextUrl;
 
 	const locale = getLocale(pathname);
-	const session = req.cookies?.get("session")?.value;
+	const session = await getCookie("access_token");
 
 	// AUTH REDIRECTS
 
@@ -38,6 +34,16 @@ export default async function proxy(req) {
 
 	if (isPub && session) {
 		req.nextUrl.pathname = !locale ? "/" : `/${locale}`;
+
+		if (
+			req.nextUrl.pathname == "/" ||
+			req.nextUrl.pathname == `/${locale}`
+		) {
+			req.nextUrl.pathname = !locale
+				? "/dashboard"
+				: `/${locale}/dashboard`;
+			return NextResponse.rewrite(new URL(req.nextUrl.pathname, req.url));
+		}
 
 		return NextResponse.redirect(
 			new URL(req.nextUrl.pathname, req.nextUrl)
