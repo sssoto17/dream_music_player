@@ -1,8 +1,10 @@
 import { Manrope } from "next/font/google";
 import "@/styles/globals.css";
 import Header from "@/components/global/Header";
+import Footer from "@/components/global/Footer";
 import ClientProviders from "@/components/global/ClientProviders";
 import SessionRefresh from "@/app/[locale]/(auth)/_components/SessionRefresh";
+import { Suspense } from "react";
 
 const manrope = Manrope({
 	variable: "--font-manrope",
@@ -35,17 +37,11 @@ export default async function RootLayout({ children, params }) {
 					<SessionRefresh />
 					<Header locale={locale} />
 					{children}
-					<Footer />
+					<Suspense>
+						<Footer />
+					</Suspense>
 				</ClientProviders>
 			</body>
 		</html>
-	);
-}
-
-function Footer() {
-	return (
-		<footer className="py-4 white/60 backdrop-blur-3xl text-slate-800 text-xl font-semibold font-display">
-			<p>Footer</p>
-		</footer>
 	);
 }

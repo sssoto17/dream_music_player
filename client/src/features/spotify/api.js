@@ -9,12 +9,38 @@ export async function getArtists(id) {
 	);
 }
 
-export async function getAlbumsByArtist(id) {
+export async function getArtistTopTracks(id) {
 	const payload = await getPublicToken();
 
-	return await fetch(`${api}/artists/${id}/albums`, payload).then((res) =>
+	return await fetch(`${api}/artists/${id}/top-tracks`, payload).then((res) =>
 		res.json()
 	);
+}
+
+export async function getAlbumsByArtist(id, type, limit, offset) {
+	const payload = await getPublicToken();
+	let q = [];
+	let url = `${api}/artists/${id}/albums`;
+
+	if (type) {
+		q = [...q, `include_groups=${type}`];
+	}
+
+	if (limit) {
+		q = [...q, `limit=${limit}`];
+	}
+
+	if (offset) {
+		q = [...q, `offset=${offset}`];
+	}
+
+	q = q.join("&");
+
+	if (q.length) {
+		url = [url, q].join("?");
+	}
+
+	return await fetch(url, payload).then((res) => res.json());
 }
 
 export async function getAlbums(id) {

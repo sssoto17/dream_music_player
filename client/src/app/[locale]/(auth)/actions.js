@@ -14,7 +14,7 @@ import {
 import { validateData } from "@/features/db/schema";
 
 import { redirect } from "next/navigation";
-import { revalidatePath, revalidateTag, updateTag } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { getLocalizedHref } from "@/lib/utils";
 
 export async function Login(locale, prev, formData) {
@@ -46,16 +46,6 @@ export async function Logout(locale) {
 
 	redirect(getLocalizedHref(locale, "/login"));
 }
-
-// export async function Logout(locale) {
-// 	const res = await deleteSession();
-// 	console.log("test logout", res);
-
-// 	if (!isAuth) {
-// 		revalidatePath("/", "layout");
-// 		redirect(getLocalizedHref(locale, "/login"));
-// 	}
-// }
 
 export async function UpdateAccount(avatar, isSignUp, prev, formData) {
 	const user = {
