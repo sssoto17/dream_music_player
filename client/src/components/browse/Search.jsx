@@ -3,11 +3,10 @@
 import { IoIosSearch } from "react-icons/io";
 import { ImSpinner2 } from "react-icons/im";
 import { startTransition, useActionState, useState } from "react";
-import { SearchAction } from "@/app/[locale]/(music)/browse/actions";
+import { SearchAction } from "@/features/actions/user_actions";
 import Image from "next/image";
 import { getLocalizedHref } from "@/lib/utils";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 
 export function SearchBar({ action, value, isPending }) {
 	function handleSearch(e) {
@@ -76,7 +75,6 @@ export function MinimalSearchbar() {
 			(a, b) => b.popularity - a.popularity
 		);
 
-	console.log(results);
 	return (
 		<section className="relative">
 			<form
@@ -161,10 +159,10 @@ function SearchResultsBox({ results, loading, isActive, exitAction }) {
 									}
 									url={
 										item?.type == "album"
-											? `/browse/${item?.artists[0]?.id}/${item?.id}`
+											? `/browse/album/${item?.id}`
 											: item?.type == "track"
-											? `/browse/${item?.artists[0]?.id}/${item?.abum?.id}`
-											: `/browse/${item?.id}`
+											? `/browse/album/${item?.abum?.id}`
+											: `/browse/artist/${item?.id}`
 									}
 									img={
 										item?.type == "album" ||

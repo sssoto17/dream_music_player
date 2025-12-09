@@ -67,7 +67,6 @@ body {
 
 	> main {
 		align-items: start;
-		align-content: start;
 		overflow-y: auto;
 	}
 }
@@ -86,6 +85,10 @@ body {
 	animation-iteration-count: --value(integer, "infinite");
 	animation-duration: var(--playback-duration, 1s);
 	animation-play-state: var(--playback-state);
+}
+
+@utility grid-cols-responsive {
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 
 .fi {

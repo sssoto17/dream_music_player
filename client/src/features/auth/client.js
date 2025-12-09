@@ -1,5 +1,3 @@
-import { getAvatarSrc } from "@/lib/utils";
-
 export const verifySessionClient = async () => {
 	let res = await fetch(`/auth/session/verify`, {
 		method: "GET",
@@ -29,7 +27,7 @@ export const getAuthUserClient = async () => {
 	return await res.json();
 };
 
-export const deleteSession = async () => {
+export const deleteSessionClient = async () => {
 	const res = await fetch("/auth/session/signout", {
 		method: "GET",
 		credentials: "include",

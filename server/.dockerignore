@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+env/
+.venv/
+venv/
+.env
+.spotify.env
+
+migrations/versions/*
+static/uploads/*

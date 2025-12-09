@@ -3,6 +3,7 @@ from flask_cors import CORS
 from os import makedirs
 
 from .db import db, migrate
+from .db.triggers import *
 from .config import Config
 from .utils import ic
 
@@ -47,7 +48,7 @@ app = create_app()
 @app.route("/")
 def index():
     try:
-        test_url = url_for("api.users.user", _external=True, id="1")
+        test_url = url_for("auth.spotify.get_authorization", _external=True)
         ic(test_url)
 
         return render_template("index.html")

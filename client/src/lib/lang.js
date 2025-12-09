@@ -39,5 +39,9 @@ export const redirectedPathname = (locale, path) => {
 };
 
 export async function getLang(lang) {
-	return await fetch(`${api}/lang/${lang}`).then((res) => res.json());
+	const res = await fetch(`${api}/lang/${lang}`);
+
+	if (!res.ok) return { error: "Request failed." };
+
+	return await res.json();
 }

@@ -35,7 +35,7 @@ def authenticate_user():
         if not token["access_token"]: raise Exception(token)
 
         # CREATE SESSION
-        user_session = UserSession(
+        user_session = User_Session(
             user_id = user.id,
             token_id = user.token.id,
             access_token = token["access_token"],
@@ -75,6 +75,8 @@ def auth_user(id):
     q = select(User).where(User.id == id)
     user = db.session.scalar(q)
 
+    ic(id)
+
     ic(user)
 
     if request.method == "GET": return make_response(user.to_dict(auth=True), 200)
@@ -105,6 +107,8 @@ def auth_user(id):
                 save_file(avatar_file, avatar_path)          
 
             db.session.commit()
+
+            ic("user verified?")
             
             if user.verification_key and user.verified_at == None:
                 email_template = render_template("email/verification.html", client_url=environ["CLIENT_URL"], verification_key=user.verification_key)

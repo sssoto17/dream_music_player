@@ -1,9 +1,16 @@
 from os import environ
 from flask import Blueprint, request, make_response, redirect, url_for 
+from sqlalchemy import select
+
 from requests import get, post
 from uuid import uuid4
 from urllib.parse import urlencode
-from ..utils import ic, b64
+
+from..db import db
+from ..db.models import *
+from ..utils import ic, b64, expires_at
+from .validation import validate_password
+from werkzeug.security import generate_password_hash
 
 app = Blueprint('spotify', __name__)
 
@@ -29,6 +36,7 @@ def get_authorization():
                 "show_dialog": environ["SPOTIFY_AUTH_TESTING_MODE"]
             }
     
+    
     return redirect(f"{url}{urlencode(payload)}")
 
 @app.route("/callback")
@@ -45,19 +53,50 @@ def get_callback():
 
             spotify_data = get(f"{environ["SPOTIFY_API_URL"]}/me", headers={"Authorization": "Bearer " + token["access_token"]}).json()
 
-            payload = {
-                "username": "",
-                "email": "",
-                "password": "temp_password",
-                "first_name": spotify_data["display_name"].split()[0], 
-                "last_name": spotify_data["display_name"].split()[-1],
-                "refresh_token": token["refresh_token"]
-                }
+            user = User(
+                username = "",
+                email = spotify_data["email"],
+                password = generate_password_hash("temp_pass"),
+                first_name = "",
+                last_name = "",
+                verification_key = uuid4().hex,
+                role = "user"
+                )
 
-            user = post(url_for("api.users.users", _external=True), data=payload).json()
-            client_url = environ["CLIENT_URL"]
+            db.session.add(user)
+            db.session.commit()
 
-            url = f"{client_url}/auth/signup?id={user["id"]}&key={user["verification_key"]}&token={token["access_token"]}"
+            rf_token = Refresh_Token(
+                refresh_token = token["refresh_token"],
+                user_id = user.id
+            )
+
+            db.session.add(rf_token)
+            db.session.commit()
+
+            user_session = User_Session(
+                user_id = user.id,
+                token_id = rf_token.id,
+                access_token = token["access_token"],
+                expires_at = expires_at(token["expires_in"]),
+            )
+
+            db.session.add(user_session)
+            db.session.commit()
+
+            # payload = {
+            #     "username": "",
+            #     "email": "",
+            #     "password": "temp_password",
+            #     "first_name": spotify_data["display_name"].split()[0], 
+            #     "last_name": spotify_data["display_name"].split()[-1],
+            #     "refresh_token": token["refresh_token"]
+            #     }
+
+            # user = post(url_for("api.users.users", _external=True), data=payload).json()
+            # client_url = environ["CLIENT_URL"]
+
+            url = f"{environ["CLIENT_URL"]}/auth/signup?id={user.id}&key={rf_token.refresh_token}&token={user_session.access_token}"
             return redirect(url)
     except Exception as ex:
         ic(ex)

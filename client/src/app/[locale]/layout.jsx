@@ -1,10 +1,7 @@
 import { Manrope } from "next/font/google";
 import "@/styles/globals.css";
-import Header from "@/components/global/Header";
-import Footer from "@/components/global/Footer";
-import ClientProviders from "@/components/global/ClientProviders";
-import SessionRefresh from "@/app/[locale]/(auth)/_components/SessionRefresh";
-import { Suspense } from "react";
+import ClientProviders from "@/components/navigation/ClientProviders";
+import SessionRefresh from "./(header)/user/_components/SessionRefresh";
 
 const manrope = Manrope({
 	variable: "--font-manrope",
@@ -24,9 +21,7 @@ export async function generateStaticParams() {
 	}));
 }
 
-export default async function RootLayout({ children, params }) {
-	const { locale = "en" } = await params;
-
+export default async function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<body
@@ -35,11 +30,7 @@ export default async function RootLayout({ children, params }) {
 			>
 				<ClientProviders>
 					<SessionRefresh />
-					<Header locale={locale} />
 					{children}
-					<Suspense>
-						<Footer />
-					</Suspense>
 				</ClientProviders>
 			</body>
 		</html>

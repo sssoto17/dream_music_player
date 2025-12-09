@@ -1,8 +1,7 @@
 from os import environ
-from flask import Blueprint, request, make_response, render_template
+from flask import Blueprint, request, make_response, render_template, jsonify
 from sqlalchemy import select
 from uuid import uuid4
-from datetime import datetime
 
 from ..db import db
 from ..db.models import *
@@ -27,30 +26,37 @@ def users():
     
     if request.method == "POST":
         try:
-            user = User(
-                username = request.form["username"].strip(),
-                email = request.form["email"],
-                password = generate_password_hash(request.form["password"]),
-                first_name = request.form["first_name"],
-                last_name = request.form["last_name"],
+            q = select(User).where(User.email == request.form["email"])
+            user = db.session.scalar(q)
+
+            if not user:
+                user = User(
+                username = request.form.get("username", "").strip(),
+                email = request.form.get("email", "").strip(),
+                password = generate_password_hash(request.form.get("password", user.password)),
+                first_name = request.form.get("first_name", ""),
+                last_name = request.form.get("last_name", ""),
                 verification_key = uuid4().hex,
                 role = "user"
-            )
+                )
 
-            db.session.add(user)
+                db.session.add(user)
+            
+            if user:
+                user.username = request.form.get("username", user.username).strip()
+                user.email = request.form.get("email", user.email).strip()
+                user.password = generate_password_hash(request.form["password"])
+                user.first_name = request.form.get("first_name", user.first_name)
+                user.last_name = request.form.get("last_name", user.last_name)
+
             db.session.commit()
 
-            token = Refresh_Token(
-                refresh_token = request.form["refresh_token"],
-                user_id = user.id
-            )
-
-            db.session.add(token)
-            db.session.commit()
-
-            return make_response(user.to_dict(auth=True), 200)
+            return make_response(user.to_dict(), 200)
+            # return url_for("auth.spotify.get_authorization", _external=True)
         except Exception as ex:
             db.session.rollback()
+
+            ic(ex)
 
             return make_response({"error": str(ex)}, 400)
         finally:
@@ -91,3 +97,97 @@ def reset_user(email):
     except Exception as ex:
         ic(ex)
         return make_response({"error": str(ex)}, 400)
+
+@app.route("/users/likes/<int:id>/<string:track_id>", methods=["GET"])
+def get_user_like(id, track_id):
+    try:
+        q = select(Liked_Track).where(Liked_Track.track_id == track_id).where(Liked_Track.user_id == id)
+        like = db.session.scalar(q)
+    
+        return make_response
+    except Exception as ex:
+                ic(ex)
+                return make_response({"error": str(ex)}, 400)
+
+@app.route("/users/likes/<int:id>", methods=["GET", "POST"])
+def user_likes(id):
+        q = select(User).where(User.id == id)
+        user = db.session.scalar(q)
+
+        if request.method == "GET":
+            q = select(Liked_Track).where(Liked_Track.user_id == id)
+            result = db.session.scalars(q).all()
+
+            likes = [
+                {"track_id": row.track_id} for row in result
+            ]
+
+            return make_response(likes, 200)
+        if request.method == "POST":
+            if not user: raise Exception("Unauthorized.")
+            track_id = request.form["track_id"]
+            
+            try:
+                q = select(Liked_Track).where(Liked_Track.track_id == track_id)
+                existing_like = db.session.scalar(q)
+
+                ic(existing_like)
+                
+                if existing_like:
+                    db.session.delete(existing_like)
+                    db.session.commit()
+
+                if not existing_like:
+                    like = Liked_Track(user_id = id, track_id = request.form["track_id"])
+                    db.session.add(like)
+                    db.session.commit()
+                
+                return make_response(user.to_dict(auth=True), 200)
+            except Exception as ex:
+                ic(ex)
+                return make_response({"error": str(ex)}, 400)
+
+@app.get("/users/<int:id>/following")
+def get_following(id):
+    try:
+        q = select(Follower).where(Follower.user_id == id)
+        result = db.session.scalars(q)
+
+        following = []
+
+        for row in result:
+            q = select(User).where(User.id == row.user_following_id)
+            user = db.session.scalar(q).to_dict()
+
+            following.append(user)
+
+        return make_response(jsonify(following), 200)
+    except Exception as ex:
+        ic(ex)
+        return make_response({"error": str(ex)}, 400)
+
+
+@app.post("/users/<int:id>/follow")
+def user_follow(id):
+    try:
+        username = request.form.get("username")
+
+        q = select(User).where(User.username == username)
+        user_following_id = db.session.scalar(q).id
+
+        if id == user_following_id: raise Exception("User cannot follow self.")
+        
+        q = select(Follower).where(Follower.user_id == id).where(Follower.user_following_id == user_following_id)
+        existing_follow = db.session.scalar(q)
+        
+        if not existing_follow:
+            follow_entry = Follower(user_id = id, user_following_id = user_following_id)
+            db.session.add(follow_entry)
+        if existing_follow: db.session.delete(existing_follow)
+        
+        db.session.commit()
+
+        return make_response("Followers updated", 200)
+    except Exception as ex:
+        ic(ex)
+        return make_response("Follow failed.", 400)

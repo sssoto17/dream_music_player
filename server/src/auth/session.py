@@ -3,7 +3,7 @@ from flask import Blueprint, make_response
 from sqlalchemy import select
 
 from ..db import db
-from ..db.models import UserSession, User, Refresh_Token
+from ..db.models import User_Session, User, Refresh_Token
 from ..utils import ic, expires_at, has_expired
 from .spotify import get_refreshed_token
 
@@ -12,8 +12,10 @@ app = Blueprint('session', __name__, url_prefix="/sessions")
 @app.route("/verify/<string:access_token>")
 def verify_session(access_token):
     try:
-        q = select(UserSession).where(UserSession.access_token == access_token)
+        q = select(User_Session).where(User_Session.access_token == access_token)
         user_session = db.session.scalar(q)
+
+        ic(user_session)
 
         if not user_session: raise Exception("Invalid session.")
 
@@ -33,7 +35,7 @@ def refresh_session(refresh_token):
 
         token = get_refreshed_token(rf.refresh_token)
 
-        user_session = UserSession(
+        user_session = User_Session(
             user_id = rf.user_id,
             token_id = rf.id,
             access_token = token["access_token"],

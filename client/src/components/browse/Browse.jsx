@@ -4,14 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { SearchBar } from "./Search";
 import { useActionState } from "react";
-import { SearchAction } from "@/app/[locale]/(music)/browse/actions";
-import { formatDuration, slugify } from "@/lib/utils";
-import {
-	ListBox,
-	ListBoxItem,
-	ListLayout,
-	Virtualizer,
-} from "react-aria-components";
+import { SearchAction } from "@/features/actions/user_actions";
+import { formatDuration } from "@/lib/utils";
 
 export default function Browse() {
 	const [state, submit, isPending] = useActionState(SearchAction);
@@ -78,7 +72,7 @@ function BrowseList({ items, loading }) {
 }
 
 function ArtistItem({ id, name, images, followers }) {
-	const link = `/browse/${id}`;
+	const link = `/browse/artist/${id}`;
 	return (
 		<li className="shrink-0 relative group flex items-center gap-6 p-2 rounded-lg text-slate-800 hover:bg-white/80">
 			{images.length ? (
@@ -114,7 +108,7 @@ function AlbumItem({ id, artists, images, name, release_date }) {
 	const { url, height, width } = images[2];
 
 	const artistName = artists.map((artist) => artist.name).join(", ");
-	const link = `/browse/${artists[0].id}/${id}`;
+	const link = `/browse/album/${id}`;
 	const releaseYear = new Date(release_date).getFullYear();
 
 	return (
@@ -140,11 +134,11 @@ function AlbumItem({ id, artists, images, name, release_date }) {
 }
 
 function TrackItem({ album, artists, duration_ms, name: trackTitle }) {
-	const { name: albumTitle, images } = album;
+	const { name: albumTitle, images, id } = album;
 	const { url, height, width } = images[2];
 
 	const artistName = artists.map((artist) => artist.name).join(", ");
-	const link = `/browse/${slugify(artists[0].name)}/${slugify(albumTitle)}`;
+	const link = `/browse/album/${id}`;
 
 	return (
 		<li className="relative group flex items-center gap-6 p-2 rounded-lg text-slate-800 hover:bg-slate-50">
@@ -180,22 +174,5 @@ function PlaceholderImg() {
 				Missing image
 			</p>
 		</div>
-	);
-}
-
-function Category({ id, name, icons, href }) {
-	const { url, width, height } = icons[0];
-	return (
-		<article className="relative">
-			<Image src={url} alt={name} width={width} height={height} />
-			<h3>
-				<Link
-					href={`/browse/${id}`}
-					className="after:absolute after:inset-0"
-				>
-					{name}
-				</Link>
-			</h3>
-		</article>
 	);
 }

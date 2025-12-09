@@ -1,7 +1,10 @@
 const { SPOTIFY_API_URL: api } = process.env;
 import { getPublicToken } from "@/features/spotify/utils";
+import { cacheTag } from "next/cache";
 
 export async function getArtists(id) {
+	"use cache";
+	cacheTag("artist");
 	const payload = await getPublicToken();
 
 	return await fetch(`${api}/artists/${id}`, payload).then((res) =>
@@ -10,6 +13,8 @@ export async function getArtists(id) {
 }
 
 export async function getArtistTopTracks(id) {
+	"use cache";
+	cacheTag("tracks");
 	const payload = await getPublicToken();
 
 	return await fetch(`${api}/artists/${id}/top-tracks`, payload).then((res) =>
@@ -18,6 +23,8 @@ export async function getArtistTopTracks(id) {
 }
 
 export async function getAlbumsByArtist(id, type, limit, offset) {
+	"use cache";
+	cacheTag("albums");
 	const payload = await getPublicToken();
 	let q = [];
 	let url = `${api}/artists/${id}/albums`;
@@ -44,12 +51,18 @@ export async function getAlbumsByArtist(id, type, limit, offset) {
 }
 
 export async function getAlbums(id) {
+	"use cache";
+	cacheTag("tracks");
 	const payload = await getPublicToken();
 
-	return await fetch(`${api}/${id}`, payload).then((res) => res.json());
+	return await fetch(`${api}/albums/${id}`, payload).then((res) =>
+		res.json()
+	);
 }
 
 export async function getSearch(query, limit, offset) {
+	"use cache";
+	cacheTag("search");
 	const payload = await getPublicToken();
 
 	let url = `${api}/search`;

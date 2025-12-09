@@ -1,7 +1,7 @@
 import { FaPlay } from "react-icons/fa";
 import {} from "react-icons/fa";
 import { formatDuration } from "@/lib/utils";
-import LikeButton from "./LikeButton";
+import LikeButton from "../user/Buttons";
 
 export default function TrackList({ items, displayNo }) {
 	return (
@@ -13,7 +13,13 @@ export default function TrackList({ items, displayNo }) {
 	);
 }
 
-export function Track({ name, duration_ms, track_number, displayNo = true }) {
+export function Track({
+	id,
+	name,
+	duration_ms,
+	track_number,
+	displayNo = true,
+}) {
 	const number = track_number.toString().padStart(2, "0");
 	const duration = formatDuration(duration_ms);
 
@@ -26,7 +32,7 @@ export function Track({ name, duration_ms, track_number, displayNo = true }) {
 				<span className="text-xs mr-2">{displayNo && number}</span>{" "}
 				{name}
 			</p>
-			<LikeButton />
+			<LikeButton trackId={id} />
 			<p className="text-xs">{duration}</p>
 		</li>
 	);

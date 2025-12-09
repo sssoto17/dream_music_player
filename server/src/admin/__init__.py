@@ -27,6 +27,8 @@ def block_user(id):
 
         db.session.commit()
 
+        ic(user)
+
         return make_response({"status": f"User updated."}, 200)
     except Exception as ex:
         ic(ex)

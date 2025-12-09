@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { getLocale } from "./lib/lang";
 import { getCookie } from "./features/auth/session";
 
-const authRoutes = ["/dashboard", "/create-account"];
-const pubRoutes = ["/login", "/auth/reset"];
+const authRoutes = ["/user/dashboard", "/create_account"];
+const pubRoutes = ["/login/reset", "/auth/reset"];
 
 const checkAuthRoute = (pathname) => {
 	return authRoutes.find((route) => pathname.includes(route));
@@ -24,7 +24,7 @@ export default async function proxy(req) {
 	const isAuth = checkAuthRoute(pathname);
 	const isPub = checkPubRoute(pathname);
 
-	if (isAuth && !session) {
+	if (!session && isAuth) {
 		req.nextUrl.pathname = !locale ? "/login" : `/${locale}/login`;
 
 		return NextResponse.redirect(
@@ -32,18 +32,8 @@ export default async function proxy(req) {
 		);
 	}
 
-	if (isPub && session) {
+	if (session && isPub) {
 		req.nextUrl.pathname = !locale ? "/" : `/${locale}`;
-
-		if (
-			req.nextUrl.pathname == "/" ||
-			req.nextUrl.pathname == `/${locale}`
-		) {
-			req.nextUrl.pathname = !locale
-				? "/dashboard"
-				: `/${locale}/dashboard`;
-			return NextResponse.rewrite(new URL(req.nextUrl.pathname, req.url));
-		}
 
 		return NextResponse.redirect(
 			new URL(req.nextUrl.pathname, req.nextUrl)
