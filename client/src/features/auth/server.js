@@ -7,7 +7,7 @@ export const verifySessionServer = async () => {
 
 	if (!access_token) return { isAuth: false };
 
-	let res = await fetch(`${api}/auth/session/verify`, {
+	let res = await fetch(`${api}/api/session/verify`, {
 		method: "GET",
 		headers: {
 			cookie: `access_token=${access_token}`,
@@ -19,7 +19,7 @@ export const verifySessionServer = async () => {
 
 		if (!refresh_token) return { isAuth: false };
 
-		res = await fetch(`${api}/auth/session/refresh`, {
+		res = await fetch(`${api}/api/session/refresh`, {
 			method: "GET",
 			headers: {
 				cookie: `refresh_token=${refresh_token}`,

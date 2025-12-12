@@ -19,13 +19,7 @@ import { Suspense } from "react";
 import { getLocalizedHref } from "@/lib/utils";
 import { AvatarIcon, AvatarFallback } from "./Avatar";
 
-export function UserTag({
-	username,
-	first_name,
-	last_name,
-	avatar,
-	size = "default",
-}) {
+export function UserTag({ username, first_name, last_name, avatar, size }) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (

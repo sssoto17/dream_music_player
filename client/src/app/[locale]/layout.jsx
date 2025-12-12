@@ -1,7 +1,7 @@
 import { Manrope } from "next/font/google";
 import "@/styles/globals.css";
 import ClientProviders from "@/components/navigation/ClientProviders";
-import SessionRefresh from "./(header)/user/_components/SessionRefresh";
+import SessionRefresh from "@/components/auth/SessionRefresh";
 
 const manrope = Manrope({
 	variable: "--font-manrope",
@@ -29,7 +29,7 @@ export default async function RootLayout({ children }) {
 				suppressHydrationWarning
 			>
 				<ClientProviders>
-					<SessionRefresh />
+					{/* <SessionRefresh /> */}
 					{children}
 				</ClientProviders>
 			</body>

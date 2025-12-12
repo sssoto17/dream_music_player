@@ -4,37 +4,28 @@ import { getLocalizedHref } from "@/lib/utils";
 import { FaPlay } from "react-icons/fa6";
 import { FaHeart } from "react-icons/fa";
 import { GoPeople } from "react-icons/go";
-import { Avatar, AvatarPlaceholder } from "@/components/user/Avatar";
-import { authIsFollowing, getAuthUser } from "@/features/auth/dal";
+import { Avatar } from "@/components/user/Avatar";
+import { authIsFollowing } from "@/features/auth/dal";
 import {
 	UserFollowButton,
 	CreatePlaylistButton,
 } from "@/components/user/Buttons";
 
-export default async function UserProfile({ locale, id }) {
-	const isAuth = await getAuthUser();
+export default async function UserProfileSidebar({ locale, id, isAuth }) {
 	const user = await getUsers(id);
-
-	const ownPage = id === isAuth?.username;
-
 	const isFollowing = await authIsFollowing(id);
-	console.log(user.followers_total);
 
 	return (
-		<article className="text-slate-700 group grid justify-items-center content-start grid-cols-responsive gap-6 py-8">
-			<Link href={getLocalizedHref(locale, `/${user.username}`)}>
-				{!user.avatar ? (
-					<AvatarPlaceholder className="row-span-2" />
-				) : (
-					<Avatar {...user} className="row-span-2" />
-				)}
+		<aside className="*:last:mb-24 row-span-full text-slate-700 group grid justify-items-center content-start grid-cols-responsive gap-6 py-8">
+			<Link href={getLocalizedHref(locale, `/user/${user.username}`)}>
+				<Avatar size="full" {...user} className="row-span-2" />
 			</Link>
 			<ProfileDetails {...user} locale={locale} />
-			{isAuth && ownPage && <UserPlaylists />}
-			{isAuth && !ownPage && (
+			{user.id !== isAuth && (
 				<UserFollowButton isFollowing={isFollowing} />
 			)}
-		</article>
+			{user.id === isAuth && <UserPlaylists />}
+		</aside>
 	);
 }
 
@@ -52,12 +43,12 @@ function ProfileDetails({
 		<section className="text-slate-500 w-full max-w-56">
 			<header className="group mb-1">
 				<h2 className="text-xl/tight text-slate-700 group-hover:text-fuchsia-900 transition-all duration-75 ease-in tracking-tight font-extrabold font-display">
-					<Link href={getLocalizedHref(locale, `/${username}`)}>
+					<Link href={getLocalizedHref(locale, `/user/${username}`)}>
 						{first_name} {last_name}
 					</Link>
 				</h2>
 				<Link
-					href={getLocalizedHref(locale, `/${username}`)}
+					href={getLocalizedHref(locale, `/user/${username}`)}
 					className="text-slate-400 tracking-tight group-hover:text-amber-800 transition-colors duration-75 ease-in font-light"
 				>
 					@{username}
@@ -89,7 +80,7 @@ function UserPlaylists() {
 		{ name: "Disney classics" },
 	];
 	return (
-		<section className="py-8 col-span-full">
+		<section className="col-span-full">
 			<article className="py-4">
 				<header className="cursor-default text-2xl font-semibold">
 					<h2>Playlists</h2>

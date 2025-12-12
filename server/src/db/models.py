@@ -49,7 +49,7 @@ class User(db.Model, IDMixin, TimeStampMixin):
     role: Mapped[Roles] = mapped_column(Enum(*get_args(Roles), name="role_enum",
         create_constraint=True,
         validate_strings=True,))
-    is_blocked: Mapped[bool] = mapped_column(default=False)
+    # is_blocked: Mapped[bool] = mapped_column(default=False)
 
     token: Mapped["Refresh_Token"] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     user_sessions: Mapped[List["User_Session"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
@@ -125,7 +125,7 @@ class Blocked_User(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
     __table_args__ = (
          UniqueConstraint("user_id"),
     )
-    __user_back_populates__ = "_blocked"
+    __user_back_populates__ = "user_blocked"
 
 class Follower(db.Model, TimeStampMixin):
     __tablename__ = "user_following"

@@ -74,8 +74,6 @@ function validateFullName(first, last) {
 	const min = 2;
 	const max = 30;
 
-	console.log(first.length);
-	console.log(last.length);
 	if (
 		first.length < min ||
 		last.length < min ||

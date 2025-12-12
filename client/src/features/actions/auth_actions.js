@@ -30,7 +30,7 @@ export async function Login(locale, prev, formData) {
 
 	updateTag("user");
 	revalidatePath("/", "layout");
-	redirect(getLocalizedHref(locale, "/user/dashboard"));
+	redirect(getLocalizedHref(locale, "/"), "replace");
 }
 
 export async function Logout(locale) {
@@ -41,7 +41,7 @@ export async function Logout(locale) {
 	revalidatePath("/", "layout");
 	updateTag("user");
 
-	redirect(getLocalizedHref(locale, "/"));
+	// redirect(getLocalizedHref(locale, "/"));
 }
 
 export async function SignUp(avatar, prev, formData) {
@@ -68,6 +68,7 @@ export async function SignUp(avatar, prev, formData) {
 	const res = await updateAuthUser(formData);
 
 	if (res.error) {
+		console.log(res.error);
 		return {
 			user: user,
 			error: res.error,
@@ -76,106 +77,70 @@ export async function SignUp(avatar, prev, formData) {
 	redirect(`/user/${user?.username}`);
 }
 
-// export async function UpdateAccount(avatar, prev, formData) {
-// 	const user = {
-// 		username: formData.get("username"),
-// 		email: formData.get("email"),
-// 		first_name: formData.get("first_name"),
-// 		last_name: formData.get("last_name"),
-// 		password: formData.get("password"),
-// 		passwordConfirm: formData.get("confirm_password"),
-// 	};
+export async function UpdateAccount(avatar, prev, formData) {
+	const user = {
+		username: formData.get("username"),
+		email: formData.get("email"),
+		first_name: formData.get("first_name"),
+		last_name: formData.get("last_name"),
+		password: formData.get("password"),
+		passwordConfirm: formData.get("confirm_password"),
+	};
 
-// 	const error = validateData(formData);
+	if (!user.password) {
+		formData.delete("password");
+		formData.delete("confirm_password");
+	}
 
-// 	if (error) {
-// 		return {
-// 			user: user,
-// 			error: error,
-// 		};
-// 	}
+	const error = validateData(formData);
 
-// 	formData.set("avatar", avatar);
-
-// 	try {
-// 		const res = await updateAuthUser(formData);
-
-// 		if (res?.error) {
-// 			return {
-// 				user: user,
-// 				error: res.error,
-// 			};
-// 		}
-// 	} catch (e) {
-// 		console.error(e);
-
-// 		return {
-// 			user: user,
-// 			error: e,
-// 		};
-// 	}
-
-// 	// toast popup "changes saved!"
-// 	console.log("changes saved!");
-// 	if (isSignUp) {
-// 		redirect("/dashboard");
-// 	}
-
-// 	updateTag("user");
-// 	return {
-// 		user: user,
-// 	};
-// }
-
-// TRY TO CONSOLIDATE THE SIGNUP AND UPDATE ACTIONS AS THEY ARE SIMILAR
-export async function UpdateAccountTest(avatar, { user }, formData) {
-	user.username = formData.get("username");
-	user.email = formData.get("email");
-	user.first_name = formData.get("first_name");
-	user.last_name = formData.get("last_name");
-	user.password = formData.get("password");
-	user.passwordConfirm = formData.get("confirm_password");
-	formData.set("avatar", avatar);
-
-	// EDIT: ensure that password validation only happens if the user doesn't already have a valid password
-	const error = validateData(user);
-
-	if (
-		error?.username ||
-		error?.email ||
-		error?.name ||
-		error?.password ||
-		error?.passwordConfirm
-	) {
+	if (error) {
 		return {
-			user: { ...user },
-			error,
+			user: user,
+			error: error,
 		};
 	}
 
-	try {
-		await updateAuthUser(formData);
-	} catch (e) {
-		console.error(e);
+	if (!avatar) {
+		formData.delete("avatar");
+	} else {
+		formData.set("avatar", avatar);
 	}
 
+	const res = await updateAuthUser(formData);
+
+	if (res.error) {
+		return {
+			user: user,
+			error: res.error,
+		};
+	}
+
+	// 	toast popup "changes saved!"
+	console.log("changes saved!");
+
 	revalidatePath("/");
-	redirect("/dashboard");
+	updateTag("user");
+	return {
+		success: true,
+		user: user,
+	};
 }
 
-export async function ResetAccountRequest(formData) {
+export async function ResetAccountRequest(prev, formData) {
 	const response = await resetUser(formData.get("email"));
 
 	if (response.status) {
 		return {
-			status: "Email with a link to reset your password has been sent to the email you provided.",
+			success:
+				"Email with a link to reset your password has been sent to the email you provided.",
 		};
 	} else {
-		return { status: "Something went wrong; please try again." };
+		return { error: "Something went wrong; please try again." };
 	}
 }
 
-export async function ResetAccount(key, formData) {
+export async function ResetAccount(key, prev, formData) {
 	const error = validateData(formData);
 
 	if (error) {
@@ -189,7 +154,7 @@ export async function ResetAccount(key, formData) {
 	}
 
 	try {
-		const res = await resetAuthUser(formData, key);
+		const res = await resetAuthUser(key, formData);
 
 		if (res?.error) {
 			return {

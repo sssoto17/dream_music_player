@@ -2,7 +2,7 @@
 
 import { getAuthUserClient, verifySessionClient } from "@/features/auth/client";
 import { useState, useEffect } from "react";
-import { SignUp } from "@/features/actions/auth_actions";
+import { SignUp, UpdateAccount } from "@/features/actions/auth_actions";
 
 export function useAuth() {
 	const [state, setState] = useState({ isLoading: true });
@@ -24,11 +24,17 @@ export function useAuth() {
 	return state;
 }
 
-export function useUserSettings(props) {
-	const [avatarPreview, setPreview] = useState(props?.avatar | null);
+export function useUserSettings(avatar, method) {
+	const [avatarPreview, setPreview] = useState(avatar || null);
 	const [avatarFile, setAvatarFile] = useState(null);
 
-	const SignUpAction = SignUp.bind(null, avatarFile);
+	let SubmitAction;
+
+	if (method == "update") {
+		SubmitAction = UpdateAccount.bind(null, avatarFile);
+	} else {
+		SubmitAction = SignUp.bind(null, avatarFile);
+	}
 
 	function updateAvatar(e) {
 		const file = e.target.files[0];
@@ -42,5 +48,10 @@ export function useUserSettings(props) {
 		setPreview(null);
 	}
 
-	return { SignUpAction, avatarPreview, updateAvatar, removeAvatar };
+	return {
+		SubmitAction,
+		avatarPreview,
+		updateAvatar,
+		removeAvatar,
+	};
 }

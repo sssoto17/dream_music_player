@@ -42,13 +42,15 @@ export async function authenticateUser(credentials) {
 		body: credentials,
 	});
 
-	if (!res.ok) return;
+	if (!res.ok) return { error: "Wrong email or password." };
 
 	return await res.json();
 }
 
 export async function getAuthUser() {
-	const user_id = await getCookie("user_id");
+	const { isAuth, user_id } = await verifySessionServer();
+
+	if (!isAuth) return redirect("/login");
 
 	const res = await fetch(`${auth_url}/me/${user_id}`);
 
@@ -70,27 +72,42 @@ export async function updateAuthUser(data) {
 
 	if (!isAuth) return redirect("/login");
 
-	console.log(user_id);
-
 	const res = await fetch(user_url(user_id), {
 		method: "PATCH",
 		body: data,
 	});
 
 	if (!res.ok) {
-		return { error: "an error occurred." };
+		const error = await res.json();
+
+		if (!error) return { error: "An error occurred." };
+
+		return error;
 	}
 
 	return await res.json();
 }
 
-export async function resetAuthUser(data, key) {
+export async function checkResetKey(key) {
+	const res = await fetch(`${auth_url}/reset/${key}`);
+
+	if (!res.ok) return { error: "Something went wrong." };
+
+	return await res.json();
+}
+
+export async function resetAuthUser(key, data) {
+	console.log(key);
+
 	if (!key) return { error: "Password reset has expired." };
 
-	return await fetch(`${auth_url}/reset/${key}`, {
+	const res = await fetch(`${auth_url}/reset/${key}`, {
 		method: "PATCH",
 		body: data,
-	}).then((res) => res.json());
+	});
+
+	if (!res.ok) return { error: "Something went wrong." };
+	return await res.json();
 }
 
 export async function deleteAuthUser() {

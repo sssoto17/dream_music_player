@@ -96,7 +96,7 @@ def get_callback():
             # user = post(url_for("api.users.users", _external=True), data=payload).json()
             # client_url = environ["CLIENT_URL"]
 
-            url = f"{environ["CLIENT_URL"]}/auth/signup?id={user.id}&key={rf_token.refresh_token}&token={user_session.access_token}"
+            url = f"{environ["CLIENT_URL"]}/api/signup?id={user.id}&key={rf_token.refresh_token}&token={user_session.access_token}"
             return redirect(url)
     except Exception as ex:
         ic(ex)

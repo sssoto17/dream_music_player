@@ -14,8 +14,8 @@ export default function Breadcrumb({ path }) {
 				className="group flex gap-2 px-4 items-center cursor-pointer hover:font-medium"
 				onClick={() => router.back()}
 			>
-				<BiSolidLeftArrow className="group-hover:text-fuchsia-900" />{" "}
-				{!path && "Back to Dashboard"}
+				<BiSolidLeftArrow className="group-hover:text-fuchsia-900" />
+				{!path && "Back"}
 			</button>
 			{path &&
 				path.map(({ title, id }) => (

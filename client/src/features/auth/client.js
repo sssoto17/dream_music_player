@@ -1,11 +1,11 @@
 export const verifySessionClient = async () => {
-	let res = await fetch(`/auth/session/verify`, {
+	let res = await fetch(`/api/session/verify`, {
 		method: "GET",
 		credentials: "include",
 	});
 
 	if (res.status === 401) {
-		res = await fetch("/auth/session/refresh", {
+		res = await fetch("/api/session/refresh", {
 			method: "GET",
 			credentials: "include",
 		});
@@ -17,7 +17,7 @@ export const verifySessionClient = async () => {
 };
 
 export const getAuthUserClient = async () => {
-	const res = await fetch("/auth/session/user", {
+	const res = await fetch("/api/session/user", {
 		method: "GET",
 		credentials: "include",
 	});
@@ -28,7 +28,7 @@ export const getAuthUserClient = async () => {
 };
 
 export const deleteSessionClient = async () => {
-	const res = await fetch("/auth/session/signout", {
+	const res = await fetch("/api/session/signout", {
 		method: "GET",
 		credentials: "include",
 	});

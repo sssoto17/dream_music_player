@@ -50,34 +50,32 @@ def authenticate_user():
         ic(ex)
         return make_response(str(ex), 400)
 
-@app.get("/reset/<string:email>")
-def reset_user(email):
-    q = select(User).where(User.email == email)
-    user = db.session.scalar(q)
+# @app.get("/reset/<string:email>")
+# def reset_user(email):
+#     q = select(User).where(User.email == email)
+#     user = db.session.scalar(q)
 
-    if not user: raise Exception("User doesn't exist.")
+#     if not user: raise Exception("User doesn't exist.")
 
-    try:
-        user.verification_key = uuid4().hex
-        db.session.commit()
+#     try:
+#         user.verification_key = uuid4().hex
+#         db.session.commit()
 
-        if user.verification_key:
-            email_template = render_template("email/password_reset.html", client_url=environ["CLIENT_URL"], verification_key=user.verification_key)
-            send_email(user.email, "Reset your password", email_template) 
+#         if user.verification_key:
+#             email_template = render_template("email/password_reset.html", client_url=environ["CLIENT_URL"], verification_key=user.verification_key)
+#             send_email(user.email, "Reset your password", email_template) 
         
-        return make_response({"status": "Password reset initiated."}, 200)
-    except Exception as ex:
-        ic(ex)
-        return make_response({"error": str(ex)}, 400)
+#         return make_response({"status": "Password reset initiated."}, 200)
+#     except Exception as ex:
+#         ic(ex)
+#         return make_response({"error": str(ex)}, 400)
 
 @app.route("/me/<int:id>", methods=["GET", "PATCH", "DELETE"])
 def auth_user(id):
     q = select(User).where(User.id == id)
     user = db.session.scalar(q)
 
-    ic(id)
-
-    ic(user)
+    if not user: raise Exception("User not signed in.")
 
     if request.method == "GET": return make_response(user.to_dict(auth=True), 200)
     
@@ -90,7 +88,6 @@ def auth_user(id):
             user.password = generate_password_hash(request.form.get("password", user.password).strip())
 
             if user.avatar and not request.files:
-                ic("no files submitted in form, but avatar in db")
                 db.session.delete(user.avatar)
                 
                 delete_file(user.avatar.path)
@@ -99,16 +96,19 @@ def auth_user(id):
             if request.files:
                 avatar_file = request.files["avatar"]
                 avatar_path = generate_file_path(avatar_file.filename, "avatar")
-
+                
                 if user.avatar and avatar_path != user.avatar.path:
                     delete_file(user.avatar.path)
                 
-                user.avatar = Avatar(path = avatar_path)
+                if user.avatar:
+                    user.avatar.path = avatar_path
+
+                if not user.avatar:
+                    user.avatar = Avatar(path = avatar_path)
+                
                 save_file(avatar_file, avatar_path)          
 
             db.session.commit()
-
-            ic("user verified?")
             
             if user.verification_key and user.verified_at == None:
                 email_template = render_template("email/verification.html", client_url=environ["CLIENT_URL"], verification_key=user.verification_key)
@@ -117,12 +117,12 @@ def auth_user(id):
             return make_response(user.to_dict(auth=True), 200)
         except Exception as ex:
             db.session.rollback()
-            ic(ex)
+            error = {"generic": str(ex)}
 
-            for arg in ex.args:
-                error = arg
-                if "Duplicate" and "email" in arg:
-                    error = {"email": "Email in use; please choose another."}
+            if "Duplicate entry" and "key 'email'" in str(ex): 
+                error["email"] = "Email is already in use."
+            if "Duplicate entry" and "key 'username'" in str(ex): 
+                error["username"] = "Username is taken."
 
             return make_response({"error": error}, 400)
     
@@ -138,23 +138,27 @@ def auth_user(id):
 
             return make_response({"user": user, "error": error}, 400)
 
-@app.route("/verify/<string:key>")
-@app.patch("/reset/<string:key>")
+@app.route("/verify/<string:key>", methods=["PATCH"])
+@app.route("/reset/<string:key>", methods=["GET", "PATCH"])
 def verify_user(key):
     try:
         q = select(User).where(User.verification_key == validate_verification_key(key))
         user = db.session.scalar(q)
+        ic(user)
 
         if not user: raise Exception("Invalid key.")
 
-        if user.verified_at:
-            user.password = generate_password_hash(request.form.get("password", user.password).strip())
-        else:
-            user.verified_at = datetime.now(timezone.utc)
+        if request.method == "GET": return make_response({"reset": user.verification_key})
+        if request.method == "PATCH":
+            if user.verified_at:
+                user.password = generate_password_hash(request.form.get("password", user.password).strip())
+            else:
+                user.verified_at = datetime.now(timezone.utc)
+            
+            user.verification_key = ""
+            db.session.commit()
 
-        user.verification_key = ""
-        db.session.commit()
-
-        return make_response(user.to_dict(), 200)
+            return make_response(user.to_dict(), 200)
     except Exception as ex:
+        ic(ex)
         return make_response({"error": str(ex)}, 400)

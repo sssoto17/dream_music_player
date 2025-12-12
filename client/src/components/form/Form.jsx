@@ -3,7 +3,10 @@ import NextForm from "next/form";
 
 export default function Form({ action, children }) {
 	return (
-		<NextForm action={action} className="grid grid-cols-6 gap-4 items-end">
+		<NextForm
+			action={action}
+			className="grid lg:grid-cols-6 gap-4 items-end"
+		>
 			{children}
 		</NextForm>
 	);
@@ -37,7 +40,14 @@ export function FormInput({
 				cols ? cols : "col-span-full"
 			}`}
 		>
-			<label htmlFor={name}>{children}</label>
+			<div className="flex flex-wrap gap-4 items-end">
+				<label htmlFor={name}>{children}</label>
+				{error && (
+					<p className="text-rose-500 text-sm font-semibold">
+						{error}
+					</p>
+				)}
+			</div>
 			<input
 				name={name}
 				id={name}

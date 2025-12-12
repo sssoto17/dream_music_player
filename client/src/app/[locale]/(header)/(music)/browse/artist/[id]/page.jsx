@@ -19,7 +19,8 @@ export default async function Page({ params }) {
 	const featured = await getAlbumsByArtist(id, "compilation,appears_on", 5);
 
 	return (
-		<main className="scroller *:last:mb-56">
+		<>
+			{/* <main className="scroller *:last:mb-56"> */}
 			<Suspense>
 				<ArtistProfile artist_id={id} />
 				{albums.total && (
@@ -44,21 +45,20 @@ export default async function Page({ params }) {
 				)}
 				{/* add similar artists */}
 			</Suspense>
-		</main>
+		</>
 	);
 }
 
 async function ArtistProfile({ artist_id }) {
-	const likes = await getAuthLikes();
+	// const likes = await getAuthLikes();
 
-	console.log(likes);
 	const { genres, followers, images, name } = await getArtists(artist_id);
 	const { tracks } = await getArtistTopTracks(artist_id);
 
 	const followersTotal = new Intl.NumberFormat().format(followers?.total);
 
 	return (
-		<section className="grid grid-cols-2 gap-x-12 py-8 text-slate-800">
+		<section className="col-span-full grid grid-cols-2 gap-x-12 py-8 text-slate-800">
 			<header className="col-span-full py-4">
 				<Breadcrumb />
 			</header>

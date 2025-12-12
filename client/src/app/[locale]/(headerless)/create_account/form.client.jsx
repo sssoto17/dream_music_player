@@ -1,34 +1,17 @@
 "use client";
 import { useActionState } from "react";
-import { FaArrowRight } from "react-icons/fa6";
+import { useUserSettings } from "@/features/auth/hooks";
 
 import AvatarPicker from "@/components/form/AvatarPicker";
 import Form, { FormInput } from "@/components/form/Form";
-import { useUserSettings } from "@/features/auth/hooks";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
-
-const { AUTH_BASE_URL: auth_url } = process.env;
+import { FaArrowRight } from "react-icons/fa6";
 
 export function SignupForm({ lang }) {
-	const { SignUpAction, avatarPreview, updateAvatar, removeAvatar } =
+	const { SubmitAction, avatarPreview, updateAvatar, removeAvatar } =
 		useUserSettings();
-	const [state, submit, isPending] = useActionState(SignUpAction);
-	// const [preview, setPreview] = useState(avatar);
-	// const [avatarFile, setAvatarFile] = useState(null);
+	const [state, submit, isPending] = useActionState(SubmitAction);
 
-	// const update = UpdateAccount.bind(null, avatarFile, isSignUp);
-
-	// function handleAvatar(e) {
-	// 	const file = e.target.files[0];
-
-	// 	setAvatarFile(file);
-	// 	setPreview(URL.createObjectURL(file));
-	// }
-
-	// function removeAvatar() {
-	// 	setAvatarFile(null);
-	// 	setPreview(null);
-	// }
+	console.log(state);
 
 	return (
 		<Form action={submit}>
@@ -53,7 +36,7 @@ export function SignupForm({ lang }) {
 				value={state?.user?.first_name}
 				error={state?.error?.name}
 				disabled={isPending}
-				cols="col-span-3"
+				cols="lg:col-span-3"
 			>
 				{lang.first_name}
 			</FormInput>
@@ -62,7 +45,7 @@ export function SignupForm({ lang }) {
 				value={state?.user?.last_name}
 				error={state?.error?.name}
 				disabled={isPending}
-				cols="col-span-3"
+				cols="lg:col-span-3"
 			>
 				{lang.last_name}
 			</FormInput>
@@ -92,10 +75,6 @@ export function SignupForm({ lang }) {
 				{lang.password_confirm}
 			</FormInput>
 			<SignUpButton disabled={isPending} />
-			{/* {isSignUp ? (
-			) : (
-				<SettingsButtons action={DeleteAccount} disabled={isPending} />
-			)} */}
 		</Form>
 	);
 }

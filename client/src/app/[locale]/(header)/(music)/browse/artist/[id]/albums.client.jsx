@@ -37,7 +37,7 @@ export default function ArtistAlbums({
 	const hasPrevEntries = Number(state?.range - 5) < 0;
 
 	return (
-		<section className="mb-16 overflow-x-visible">
+		<section className="col-span-full mb-16 overflow-x-visible :last:mb-56">
 			<header className="py-4 flex gap-8">
 				<h3 className="text-3xl font-bold font-display grow">
 					{children}
@@ -72,11 +72,11 @@ export default function ArtistAlbums({
 	);
 }
 function AlbumTile({ name, images, id }) {
-	const { locale, artistID } = useParams();
+	const { locale } = useParams();
 	const { url, width, height } = images[1];
 	return (
 		<li className="hover:scale-105 group shrink-0 max-w-56 transition-all duration-75 ease-in">
-			<Link href={getLocalizedHref(locale, `/${artistID}/${id}`)}>
+			<Link href={getLocalizedHref(locale, `/browse/album/${id}`)}>
 				<Image
 					src={url}
 					alt={name}

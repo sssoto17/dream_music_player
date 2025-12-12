@@ -22,8 +22,8 @@ export default async function Page({ params }) {
 	// const breadcrumbPath = [{ title: name, id: id }];
 
 	return (
-		<main>
-			<section className="grid grid-cols-2 gap-12 py-16 text-slate-800">
+		<>
+			<section className="col-span-full grid grid-cols-2 gap-12 py-16 text-slate-800">
 				<Image
 					src={album.images[0]?.url}
 					width={album.images[0]?.width}
@@ -35,8 +35,8 @@ export default async function Page({ params }) {
 			</section>
 			{/* <Suspense>
 				<BrowseList locale={locale} id={id} />
-			</Suspense> */}
-		</main>
+				</Suspense> */}
+		</>
 	);
 }
 

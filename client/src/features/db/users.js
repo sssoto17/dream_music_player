@@ -54,5 +54,9 @@ export async function verifyUser(key) {
 export async function resetUser(email) {
 	const url = `${api_url}/users/reset/${email}`;
 
-	return await fetch(url).then((res) => res.json());
+	const res = await fetch(url);
+
+	if (!res.ok) return { error: "Something went wrong." };
+
+	return await res.json();
 }

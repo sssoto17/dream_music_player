@@ -77,15 +77,17 @@ def user(id = None, username = None):
     except Exception as ex:
         return make_response({"error": str(ex)}, 400)
 
+
 @app.get("/users/reset/<string:email>")
 def reset_user(email):
-    q = select(User).where(User.email == email)
+    q = select(User).where(User.email == email)        
     user = db.session.scalar(q)
 
     if not user: raise Exception("User doesn't exist.")
 
     try:
-        user.verification_key = uuid4().hex
+        key = uuid4().hex
+        user.verification_key = validate_verification_key(key)
         db.session.commit()
 
         if user.verification_key:
