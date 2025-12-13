@@ -40,16 +40,28 @@ export default async function Page({ params }) {
 	);
 }
 
-function AlbumTracks({ name, artists, tracks }) {
+function AlbumTracks({ id, name, artists, tracks }) {
+	const path = [
+		{
+			title: artists[0].name,
+			id: artists[0].id,
+			cat: "artist",
+		},
+		{
+			title: name,
+			id: id,
+			cat: "album",
+		},
+	];
 	return (
 		<article>
 			<header className="py-6">
-				<div>
-					<Link href="/">Go back</Link>
-					<p>
+				<div className="flex gap-4 items-center">
+					<Breadcrumb path={path} />
+					{/* <p>
 						<span className="opacity-80">{artists[0].name} /</span>{" "}
 						{name}
-					</p>
+					</p> */}
 				</div>
 				<h2 className="cursor-default text-4xl font-semibold font-display">
 					{name}

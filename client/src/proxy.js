@@ -14,39 +14,39 @@ const checkPubRoute = (pathname) => {
 };
 
 export default async function proxy(req) {
-	// const { pathname } = req.nextUrl;
+	const { pathname } = req.nextUrl;
 
-	// const locale = getLocale(pathname);
-	// const session = await getCookie("access_token");
+	const locale = getLocale(pathname);
+	const session = await getCookie("access_token");
 
-	// // AUTH REDIRECTS
+	// AUTH REDIRECTS
 
-	// const isAuth = checkAuthRoute(pathname);
-	// const isPub = checkPubRoute(pathname);
+	const isAuth = checkAuthRoute(pathname);
+	const isPub = checkPubRoute(pathname);
 
-	// if (!session && isAuth) {
-	// 	req.nextUrl.pathname = !locale ? "/login" : `/${locale}/login`;
+	if (!session && isAuth) {
+		req.nextUrl.pathname = !locale ? "/login" : `/${locale}/login`;
 
-	// 	return NextResponse.redirect(
-	// 		new URL(req.nextUrl.pathname, req.nextUrl)
-	// 	);
-	// }
+		return NextResponse.redirect(
+			new URL(req.nextUrl.pathname, req.nextUrl)
+		);
+	}
 
-	// if (session && isPub) {
-	// 	req.nextUrl.pathname = !locale ? "/" : `/${locale}`;
+	if (session && isPub) {
+		req.nextUrl.pathname = !locale ? "/" : `/${locale}`;
 
-	// 	return NextResponse.redirect(
-	// 		new URL(req.nextUrl.pathname, req.nextUrl)
-	// 	);
-	// }
+		return NextResponse.redirect(
+			new URL(req.nextUrl.pathname, req.nextUrl)
+		);
+	}
 
 	// LOCALE URL
 
-	// if (!locale) {
-	// 	req.nextUrl.pathname = `/en${pathname}`;
+	if (!locale) {
+		req.nextUrl.pathname = `/en${pathname}`;
 
-	// 	return NextResponse.rewrite(new URL(req.nextUrl.pathname, req.url));
-	// }
+		return NextResponse.rewrite(new URL(req.nextUrl.pathname, req.url));
+	}
 
 	return NextResponse.next();
 }

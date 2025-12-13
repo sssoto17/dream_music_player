@@ -1,16 +1,8 @@
 "server-only";
-// import { verifySession } from "../auth/session";
-import { redirect } from "next/navigation";
-import { getCookie } from "./session";
-// import { getLocalizedHref } from "@/lib/utils";
-// import { verifySession } from "./session";
 import { verifySessionClient } from "./client";
-import { getAvatarSrc } from "@/lib/utils";
-// import { cookies } from "next/headers";
-// import { verifyUser } from "../db/users";
-// import { cacheLife } from "next/cache";
-import { getUserFollowing } from "../db/users";
 import { verifySessionServer } from "./server";
+import { getAvatarSrc } from "@/lib/utils";
+import { getUserFollowing } from "../db/users";
 
 const {
 	AUTH_BASE: auth_url,
@@ -50,7 +42,7 @@ export async function authenticateUser(credentials) {
 export async function getAuthUser() {
 	const { isAuth, user_id } = await verifySessionServer();
 
-	if (!isAuth) return redirect("/login");
+	if (!isAuth) return { isAuth };
 
 	const res = await fetch(`${auth_url}/me/${user_id}`);
 
@@ -64,13 +56,13 @@ export async function getAuthUser() {
 		user.avatar = avatar;
 	}
 
-	return user;
+	return { isAuth, user };
 }
 
 export async function updateAuthUser(data) {
 	const { isAuth, user_id } = await verifySessionServer();
 
-	if (!isAuth) return redirect("/login");
+	if (!isAuth) return { isAuth };
 
 	const res = await fetch(user_url(user_id), {
 		method: "PATCH",
@@ -97,8 +89,6 @@ export async function checkResetKey(key) {
 }
 
 export async function resetAuthUser(key, data) {
-	console.log(key);
-
 	if (!key) return { error: "Password reset has expired." };
 
 	const res = await fetch(`${auth_url}/reset/${key}`, {
@@ -113,7 +103,7 @@ export async function resetAuthUser(key, data) {
 export async function deleteAuthUser() {
 	const { isAuth, user_id } = await verifySessionClient();
 
-	if (!isAuth) return redirect("/login");
+	if (!isAuth) return { isAuth };
 
 	return await fetch(user_url(user_id), { method: "DELETE" }).then((res) =>
 		res.json()
@@ -121,9 +111,9 @@ export async function deleteAuthUser() {
 }
 
 export async function authToggleFollow(data) {
-	const user_id = await getCookie("user_id");
+	const { isAuth, user_id } = await verifySessionServer();
 
-	if (!user_id) return;
+	if (!isAuth) return { isAuth };
 
 	const url = `${api_url}/users/${user_id}/follow`;
 
@@ -138,9 +128,9 @@ export async function authToggleFollow(data) {
 }
 
 export async function authToggleLikeTrack(data) {
-	const user_id = await getCookie("user_id");
+	const { isAuth, user_id } = await verifySessionClient();
 
-	if (!user_id) return;
+	if (!isAuth) return { isAuth };
 
 	const url = `${api_url}/users/likes/${user_id}`;
 
@@ -155,7 +145,9 @@ export async function authToggleLikeTrack(data) {
 }
 
 export async function authIsFollowing(username) {
-	const user_id = await getCookie("user_id");
+	const { isAuth, user_id } = await verifySessionServer();
+
+	if (!isAuth) return { isAuth };
 
 	const following = await getUserFollowing(user_id);
 
@@ -163,9 +155,9 @@ export async function authIsFollowing(username) {
 }
 
 export async function getAuthLikes() {
-	const user_id = await getCookie("user_id");
+	const { isAuth, user_id } = await verifySessionClient();
 
-	if (!user_id) return;
+	if (!isAuth) return { isAuth };
 
 	const url = `${api_url}/users/likes/${user_id}`;
 
@@ -177,9 +169,11 @@ export async function getAuthLikes() {
 }
 
 export async function adminBlockUser(id) {
-	const res = await fetch(`${server_url}/admin/restrict/${id}`);
+	const { isAuth } = await verifySessionClient();
 
-	console.log(res);
+	if (!isAuth) return { isAuth };
+
+	const res = await fetch(`${server_url}/admin/restrict/${id}`);
 
 	if (!res.ok) return { error: "Could not complete request." };
 

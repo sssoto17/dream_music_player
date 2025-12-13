@@ -87,7 +87,7 @@ export function UserFollowButton({ isFollowing }) {
 					e.target.textContent = "Following";
 				}
 			}}
-			className={`${stateStyle} text-white max-w-48 w-full flex place-content-center items-center gap-2 mx-auto rounded-full py-2 px-4 font-semibold font-display cursor-pointer hover:scale-101 transition-all duration-75 ease-in`}
+			className={`${stateStyle} text-white my-8 max-w-48 w-full flex place-content-center items-center gap-2 mx-auto rounded-full py-2 px-4 font-semibold font-display cursor-pointer hover:scale-101 transition-all duration-75 ease-in`}
 		>
 			{isActive ? "Following" : "Follow"}
 		</button>

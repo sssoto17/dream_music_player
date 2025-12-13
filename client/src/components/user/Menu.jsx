@@ -23,7 +23,7 @@ export function UserTag({ username, first_name, last_name, avatar, size }) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
-		<Suspense fallback={<AvatarFallback />}>
+		<Suspense fallback={<AvatarFallback size="icon" />}>
 			<MenuTrigger isOpen={isOpen} onOpenChange={setIsOpen}>
 				<Button className="group cursor-pointer focus:outline-1 focus-within:outline-fuchsia-300 rounded-full">
 					<AvatarIcon

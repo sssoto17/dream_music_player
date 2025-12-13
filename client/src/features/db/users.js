@@ -35,7 +35,6 @@ export async function getUsers(id) {
 
 export async function getUserFollowing(id) {
 	"use cache";
-	cacheLife("minutes");
 	cacheTag("user_following");
 
 	const res = await fetch(`${api_url}/users/${id}/following`);

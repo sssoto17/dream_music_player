@@ -11,10 +11,8 @@ export async function FollowAction(formData) {
 
 	if (!res.ok) return error;
 
-	updateTag("auth_user");
-	updateTag("user");
-	updateTag("users");
-	revalidatePath("/");
+	updateTag("user_following");
+	revalidatePath("/user", "layout");
 	return await res.json();
 }
 

@@ -28,6 +28,7 @@ export function SignupForm({ lang }) {
 				value={state?.user?.username}
 				error={state?.error?.username}
 				disabled={isPending}
+				withErrorLabel={state?.error?.username}
 			>
 				{lang.username}
 			</FormInput>
@@ -54,6 +55,7 @@ export function SignupForm({ lang }) {
 				value={state?.user?.email}
 				error={state?.error?.email}
 				disabled={isPending}
+				withErrorLabel={state?.error?.email}
 			>
 				{lang.email}
 			</FormInput>

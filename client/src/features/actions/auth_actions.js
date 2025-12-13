@@ -41,7 +41,7 @@ export async function Logout(locale) {
 	revalidatePath("/", "layout");
 	updateTag("user");
 
-	// redirect(getLocalizedHref(locale, "/"));
+	redirect(getLocalizedHref(locale, "/"), "replace");
 }
 
 export async function SignUp(avatar, prev, formData) {

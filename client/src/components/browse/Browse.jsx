@@ -7,11 +7,11 @@ import { useActionState } from "react";
 import { SearchAction } from "@/features/actions/user_actions";
 import { formatDuration } from "@/lib/utils";
 
-export default function Browse() {
+export default function Browse({ className: styles }) {
 	const [state, submit, isPending] = useActionState(SearchAction);
 
 	return (
-		<section className="py-8 col-start-2 col-span-2">
+		<section className={`py-8 col-span-full ${styles}`}>
 			<header>
 				<SearchBar
 					action={submit}

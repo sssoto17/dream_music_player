@@ -3,13 +3,11 @@ import { SignInForm } from "./form.client";
 import { getLocalizedHref } from "@/lib/utils";
 import { getLang } from "@/lib/lang";
 
-// const { AUTH_BASE_URL: auth_url } = process.env;
+const { AUTH_BASE_URL: auth_url } = process.env;
 
 export default async function Login({ params }) {
 	const { locale } = await params;
 	const lang = await getLang(locale);
-
-	return null;
 
 	return (
 		<article className="px-16 py-12 grid grid-rows-[auto_1fr_auto] content-start">

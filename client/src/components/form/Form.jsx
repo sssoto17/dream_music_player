@@ -21,6 +21,7 @@ export function FormInput({
 	disabled,
 	cols,
 	children,
+	withErrorLabel,
 }) {
 	// input sizes; can be full (default; col-span-full), half (col-span-3), or third (col-span-2)
 	// input state; default, focus, disabled, invalid based on error state
@@ -42,7 +43,7 @@ export function FormInput({
 		>
 			<div className="flex flex-wrap gap-4 items-end">
 				<label htmlFor={name}>{children}</label>
-				{error && (
+				{withErrorLabel && (
 					<p className="text-rose-500 text-sm font-semibold">
 						{error}
 					</p>

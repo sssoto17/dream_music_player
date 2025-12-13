@@ -11,8 +11,6 @@ export default async function ResetPage({ params }) {
 
 	const { reset } = await checkResetKey(key);
 
-	console.log(reset);
-
 	if (key && key !== reset) redirect("/login/reset");
 
 	return (

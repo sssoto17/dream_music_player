@@ -17,6 +17,11 @@ export function useAuth() {
 						isLoading: false,
 					});
 				});
+			} else {
+				setState({
+					isAuth: false,
+					isLoading: false,
+				});
 			}
 		});
 	}, []);

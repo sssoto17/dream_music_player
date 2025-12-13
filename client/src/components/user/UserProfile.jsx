@@ -1,31 +1,27 @@
 import Link from "next/link";
-import { getUsers } from "@/features/db/users";
+import { Avatar, AvatarFallback } from "@/components/user/Avatar";
+import { CreatePlaylistButton } from "@/components/user/Buttons";
 import { getLocalizedHref } from "@/lib/utils";
 import { FaPlay } from "react-icons/fa6";
 import { FaHeart } from "react-icons/fa";
 import { GoPeople } from "react-icons/go";
-import { Avatar } from "@/components/user/Avatar";
-import { authIsFollowing } from "@/features/auth/dal";
-import {
-	UserFollowButton,
-	CreatePlaylistButton,
-} from "@/components/user/Buttons";
+import { Suspense } from "react";
 
-export default async function UserProfileSidebar({ locale, id, isAuth }) {
-	const user = await getUsers(id);
-	const isFollowing = await authIsFollowing(id);
-
+export default async function UserProfileSidebar(props) {
 	return (
-		<aside className="*:last:mb-24 row-span-full text-slate-700 group grid justify-items-center content-start grid-cols-responsive gap-6 py-8">
-			<Link href={getLocalizedHref(locale, `/user/${user.username}`)}>
-				<Avatar size="full" {...user} className="row-span-2" />
-			</Link>
-			<ProfileDetails {...user} locale={locale} />
-			{user.id !== isAuth && (
-				<UserFollowButton isFollowing={isFollowing} />
-			)}
-			{user.id === isAuth && <UserPlaylists />}
-		</aside>
+		<section className="grid justify-items-center content-start grid-cols-responsive gap-6 ">
+			<Suspense fallback={<AvatarFallback size="full" />}>
+				<Link
+					href={getLocalizedHref(
+						props.locale,
+						`/user/${props.username}`
+					)}
+				>
+					<Avatar size="full" {...props} className="row-span-2" />
+				</Link>
+			</Suspense>
+			<ProfileDetails {...props} />
+		</section>
 	);
 }
 
@@ -70,7 +66,7 @@ function ProfileDetails({
 	);
 }
 
-function UserPlaylists() {
+export function UserPlaylists() {
 	const samplePlaylists = [
 		{ name: "Favorites", type: "user_likes" },
 		{ name: "Dance Bops" },

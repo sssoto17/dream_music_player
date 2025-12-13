@@ -1,7 +1,6 @@
-import { WebPlayerFooter } from "../musicplayer/WebPlayback";
-import { getCookie } from "@/features/auth/session";
-import { getAuthUser } from "@/features/auth/dal";
 import { Suspense } from "react";
+import { WebPlayerFooter } from "../musicplayer/WebPlayback";
+import { getAuthUser } from "@/features/auth/dal";
 
 export default async function Footer() {
 	return (
@@ -14,10 +13,9 @@ export default async function Footer() {
 }
 
 async function Navigation() {
-	const user_id = await getCookie("user_id");
-	const user = await getAuthUser(user_id);
+	const { isAuth, user } = await getAuthUser();
 
-	if (!user) return <p>Copyright 2025 S. S. Soto</p>;
+	if (!isAuth) return <p>Copyright 2025 S. S. Soto</p>;
 
 	return <WebPlayerFooter {...user} />;
 }

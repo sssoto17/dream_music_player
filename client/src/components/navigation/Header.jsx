@@ -1,11 +1,9 @@
 import { Suspense } from "react";
-import { getCookie } from "@/features/auth/session";
-import { getAuthUser } from "@/features/auth/dal";
+import Logo from "../global/Logo";
 import { UserTag } from "../user/Menu";
 import { MinimalSearchbar } from "../browse/Search";
-import Logo from "../global/Logo";
 import { LocaleSwitchVariant } from "./LocaleSwitch";
-import { SignInButton, SignUpButton } from "./ClientProviders";
+import { getAuthUser } from "@/features/auth/dal";
 
 export default async function Header({ locale }) {
 	return (
@@ -21,21 +19,14 @@ export default async function Header({ locale }) {
 }
 
 async function Navigation() {
-	const user_id = await getCookie("user_id");
-	const user = await getAuthUser(user_id);
+	const { isAuth, user } = await getAuthUser();
+
+	if (!isAuth) return <LocaleSwitchVariant />;
 
 	return (
 		<div className="flex gap-4 items-center">
-			{!user ? (
-				<>
-					<LocaleSwitchVariant />
-				</>
-			) : (
-				<>
-					<MinimalSearchbar />
-					<UserTag {...user} />
-				</>
-			)}
+			<MinimalSearchbar />
+			<UserTag {...user} />
 		</div>
 	);
 }

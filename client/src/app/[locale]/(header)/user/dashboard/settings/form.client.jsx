@@ -46,6 +46,7 @@ export default function Settings({
 				value={state?.user?.username}
 				error={state?.error?.username}
 				disabled={isPending}
+				withErrorLabel={state?.error?.username}
 			>
 				{dict.username}
 			</FormInput>
@@ -72,6 +73,7 @@ export default function Settings({
 				value={state?.user?.email}
 				error={state?.error?.email}
 				disabled={isPending}
+				withErrorLabel={state?.error?.email}
 			>
 				{dict.email}
 			</FormInput>

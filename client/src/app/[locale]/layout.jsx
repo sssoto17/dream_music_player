@@ -29,7 +29,7 @@ export default async function RootLayout({ children }) {
 				suppressHydrationWarning
 			>
 				<ClientProviders>
-					{/* <SessionRefresh /> */}
+					<SessionRefresh />
 					{children}
 				</ClientProviders>
 			</body>

@@ -57,10 +57,17 @@ async function ArtistProfile({ artist_id }) {
 
 	const followersTotal = new Intl.NumberFormat().format(followers?.total);
 
+	const path = [
+		{
+			id: artist_id,
+			title: name,
+			cat: "artist",
+		},
+	];
 	return (
 		<section className="col-span-full grid grid-cols-2 gap-x-12 py-8 text-slate-800">
 			<header className="col-span-full py-4">
-				<Breadcrumb />
+				<Breadcrumb path={path} />
 			</header>
 			<Image
 				src={images[0]?.url}
