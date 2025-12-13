@@ -4,7 +4,6 @@ import {
 	getArtistTopTracks,
 } from "@/features/spotify/api";
 import Image from "next/image";
-import { cacheLife } from "next/cache";
 import Breadcrumb from "@/components/navigation/Breadcrumbs";
 import ArtistAlbums from "./albums.client";
 import TrackList from "@/components/musicplayer/TrackList";
@@ -43,7 +42,6 @@ export default async function Page({ params }) {
 						Also appears on
 					</ArtistAlbums>
 				)}
-				{/* add similar artists */}
 			</Suspense>
 		</>
 	);

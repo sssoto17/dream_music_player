@@ -8,7 +8,7 @@ export default async function HeaderLayout({ params, sidebar, children }) {
 	return (
 		<>
 			<Header locale={locale} />
-			<main className="scroller overflow-x-clip mb-20">
+			<main className="scroller overflow-x-visible *:last:mb-20">
 				<div className="grid grid-cols-3 grid-rows-[auto_1fr] gap-x-6 content-start">
 					<Suspense>{sidebar}</Suspense>
 					<Suspense>{children}</Suspense>

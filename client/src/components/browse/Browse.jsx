@@ -40,16 +40,15 @@ export default function Browse({ className: styles }) {
 function BrowseScroller({ items, loading }) {
 	return (
 		<article
-			className={`relative transition-transform ease-in duration-75 ${
+			className={`overlay overflow-clip rounded-2xl transition-transform ease-in duration-75 ${
 				loading && "animate-pulse opacity-70"
 			}`}
 		>
-			<ul className="scroll-smooth snap-x *:snap-start flex gap-4 my-8 py-1 scroller scroller-hidden overflow-x-scroll w-full relative">
+			<ul className="flex gap-4 py-1 my-8 scroll-smooth scroller-hidden hover:scroller snap-x *:snap-start overflow-x-scroll">
 				{items.map((item) => {
 					return <ArtistItem key={item.id} {...item} />;
 				})}
 			</ul>
-			<div className="absolute rounded-2xl inset-0 bg-linear-to-l from-white via-white/0 to-25% pointer-events-none" />
 		</article>
 	);
 }

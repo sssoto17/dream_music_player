@@ -37,12 +37,12 @@ export default function ArtistAlbums({
 	const hasPrevEntries = Number(state?.range - 5) < 0;
 
 	return (
-		<section className="col-span-full mb-16 overflow-x-visible :last:mb-56">
+		<section className="col-span-full mb-24">
 			<header className="py-4 flex gap-8">
-				<h3 className="text-3xl font-bold font-display grow">
+				<h3 className="text-3xl font-bold font-display grow cursor-default">
 					{children}
 				</h3>
-				<nav className="text-slate-700 flex gap-4 px-16 text-3xl *:not-disabled:cursor-pointer *:disabled:text-slate-400 *:not-disabled:hover:text-amber-800 *:not-disabled:hover:scale-110 transition-all duration-75 ease-in">
+				<nav className="text-slate-700 flex px-8 text-4xl *:p-4 *:not-disabled:cursor-pointer *:disabled:text-slate-400 *:not-disabled:hover:text-amber-800 *:not-disabled:hover:scale-110 transition-all duration-75 ease-in">
 					<button
 						disabled={hasPrevEntries || isPending}
 						aria-label="Back"
@@ -59,7 +59,7 @@ export default function ArtistAlbums({
 					</button>
 				</nav>
 			</header>
-			<ul className="h-48 grid grid-cols-5 gap-8 col-span-full">
+			<ul className="h-56 grid grid-cols-5 content-start overflow-visible gap-8 col-span-full">
 				{isPending ? (
 					<Placeholder />
 				) : (
@@ -75,7 +75,7 @@ function AlbumTile({ name, images, id }) {
 	const { locale } = useParams();
 	const { url, width, height } = images[1];
 	return (
-		<li className="hover:scale-105 group shrink-0 max-w-56 transition-all duration-75 ease-in">
+		<li className="group shrink-0 max-w-56 hover:scale-105 transition-all duration-75 ease-in">
 			<Link href={getLocalizedHref(locale, `/browse/album/${id}`)}>
 				<Image
 					src={url}
