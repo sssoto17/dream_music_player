@@ -46,7 +46,7 @@ export async function getAuthUser() {
 
 	const res = await fetch(`${auth_url}/me/${user_id}`);
 
-	if (!res.ok) return;
+	if (!res.ok) return { isAuth };
 
 	const user = await res.json();
 

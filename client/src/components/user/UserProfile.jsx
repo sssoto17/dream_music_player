@@ -4,23 +4,26 @@ import { CreatePlaylistButton } from "@/components/user/Buttons";
 import { getLocalizedHref } from "@/lib/utils";
 import { FaPlay } from "react-icons/fa6";
 import { FaHeart } from "react-icons/fa";
-import { GoPeople } from "react-icons/go";
+import { RiPoliceBadgeLine } from "react-icons/ri";
 import { Suspense } from "react";
+import { getUser } from "@/features/db/users";
+import FollowersCount, { FollowersProvider } from "./DynamicFollowers";
+import { getLang } from "@/lib/lang";
 
-export default async function UserProfileSidebar(props) {
+export default async function UserProfileSidebar({ locale, id }) {
+	const user = await getUser(id);
+	const dict = await getLang(locale);
+
 	return (
-		<section className="grid justify-items-center content-start grid-cols-responsive gap-6 ">
+		<section className="grid content-start grid-res-cols-4xs gap-6 w-full">
 			<Suspense fallback={<AvatarFallback size="full" />}>
 				<Link
-					href={getLocalizedHref(
-						props.locale,
-						`/user/${props.username}`
-					)}
+					href={getLocalizedHref(locale, `/user/${user?.username}`)}
 				>
-					<Avatar size="full" {...props} className="row-span-2" />
+					<Avatar size="full" {...user} className="row-span-2" />
 				</Link>
 			</Suspense>
-			<ProfileDetails {...props} />
+			<ProfileDetails locale={locale} {...user} dict={dict} />
 		</section>
 	);
 }
@@ -33,33 +36,46 @@ function ProfileDetails({
 	bio,
 	created_at,
 	followers_total,
+	role,
+	dict,
 }) {
 	const member_since = new Date(created_at).toLocaleDateString();
 	return (
 		<section className="text-slate-500 w-full max-w-56">
 			<header className="group mb-1">
-				<h2 className="text-xl/tight text-slate-700 group-hover:text-fuchsia-900 transition-all duration-75 ease-in tracking-tight font-extrabold font-display">
-					<Link href={getLocalizedHref(locale, `/user/${username}`)}>
-						{first_name} {last_name}
+				<h2 className="text-xl/tight text-slate-700 transition-all duration-75 ease-in tracking-tight font-extrabold font-display">
+					<Link
+						href={getLocalizedHref(locale, `/user/${username}`)}
+						className="flex gap-2 items-center text-fuchsia-900"
+					>
+						<span>
+							{first_name} {last_name}
+						</span>
+						{role === "admin" && (
+							<RiPoliceBadgeLine aria-label="Admin badge" />
+						)}
 					</Link>
 				</h2>
 				<Link
 					href={getLocalizedHref(locale, `/user/${username}`)}
-					className="text-slate-400 tracking-tight group-hover:text-amber-800 transition-colors duration-75 ease-in font-light"
+					className="text-slate-400 tracking-tight hover:text-amber-800 transition-colors duration-75 ease-in font-light"
 				>
 					@{username}
 				</Link>
 			</header>
-			<p className="font-display cursor-default flex gap-1 items-center">
-				<GoPeople />
-				{!followers_total
-					? "No followers"
-					: followers_total === 1
-					? `${followers_total} follower`
-					: `${followers_total} followers`}
-			</p>
+			<FollowersProvider followers={followers_total}>
+				<FollowersCount
+					username={username}
+					className="font-display"
+					icon
+					single={dict["follower"]}
+					multi={dict["followers"]}
+					none={dict["no_followers"]}
+				/>
+			</FollowersProvider>
 			<p className="text-sm/tight py-4 text-slate-500 cursor-default">
-				Member since <span className="font-medium">{member_since}</span>
+				{dict["member_since"]}{" "}
+				<span className="font-medium">{member_since}</span>
 			</p>
 			<p>{bio}</p>
 		</section>
@@ -76,12 +92,12 @@ export function UserPlaylists() {
 		{ name: "Disney classics" },
 	];
 	return (
-		<section className="col-span-full">
+		<section>
 			<article className="py-4">
 				<header className="cursor-default text-2xl font-semibold">
 					<h2>Playlists</h2>
 				</header>
-				<ul className="my-6 bg-white/40 backdrop-blur-2xl">
+				<ul className="my-4 bg-white/40 backdrop-blur-2xl min-w-4xs">
 					{samplePlaylists.map((playlist, id) => {
 						return <UserPlaylistItem key={id} {...playlist} />;
 					})}

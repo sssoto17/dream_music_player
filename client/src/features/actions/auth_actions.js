@@ -38,8 +38,8 @@ export async function Logout(locale) {
 	await deleteCookie("access_token");
 	await deleteCookie("user_id");
 
-	revalidatePath("/", "layout");
 	updateTag("user");
+	revalidatePath("/", "layout");
 
 	redirect(getLocalizedHref(locale, "/"), "replace");
 }
@@ -74,6 +74,9 @@ export async function SignUp(avatar, prev, formData) {
 			error: res.error,
 		};
 	}
+
+	updateTag("user");
+	revalidatePath("/", layout);
 	redirect(`/user/${user?.username}`);
 }
 
@@ -116,11 +119,8 @@ export async function UpdateAccount(avatar, prev, formData) {
 		};
 	}
 
-	// 	toast popup "changes saved!"
-	console.log("changes saved!");
-
-	revalidatePath("/");
 	updateTag("user");
+	revalidatePath("/", "layout");
 	return {
 		success: true,
 		user: user,
@@ -178,13 +178,11 @@ export async function DeleteAccount() {
 	}
 
 	// display a toast with a success message, followed by a redirect to home after a couple sec
-	revalidatePath("/");
+	revalidatePath("/", "layout");
 	redirect("/"); // redirect to successful deletion page which will automatically redirect to homepage after three seconds
 }
 
 export async function BlockUser(user_id) {
-	console.log(user_id);
-
 	const res = await adminBlockUser(user_id);
 
 	if (!res.ok) return error;

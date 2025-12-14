@@ -1,6 +1,7 @@
 from os import environ
 from flask import Blueprint, request, make_response, render_template, jsonify
 from sqlalchemy import select
+from sqlalchemy.sql.operators import ilike_op
 from uuid import uuid4
 
 from ..db import db
@@ -52,15 +53,30 @@ def users():
             db.session.commit()
 
             return make_response(user.to_dict(), 200)
-            # return url_for("auth.spotify.get_authorization", _external=True)
         except Exception as ex:
             db.session.rollback()
-
             ic(ex)
-
             return make_response({"error": str(ex)}, 400)
         finally:
             if db.session in locals(): db.session.close()
+
+@app.get("/search/users")
+def search_users():
+    search = request.args.get("q")
+    try:
+        q = select(User).filter(ilike_op(User.username, f"%{str(search)}%"))
+        result = db.session.scalars(q)
+
+        ic(result)
+        if not result: raise Exception("No matching results.")
+
+        users = [
+            row.to_dict() for row in result
+        ]
+        return make_response(users, 200)
+    except Exception as ex:
+        ic(ex)
+        return make_response({"error": str(ex)}, 400)
     
 @app.route("/users/<int:id>")
 @app.route("/users/<string:username>")
@@ -72,6 +88,8 @@ def user(id = None, username = None):
             q = select(User).where(User.username == username)
         
         user = db.session.scalar(q)
+
+        if not user: raise Exception("User doesn't exist.")
 
         return make_response(user.to_dict(), 200)
     except Exception as ex:
@@ -91,7 +109,6 @@ def reset_user(email):
         db.session.commit()
 
         if user.verification_key:
-            ic("sending email")
             email_template = render_template("email/password_reset.html", client_url=environ["CLIENT_URL"], verification_key=user.verification_key)
             send_email(user.email, "Reset your password", email_template) 
         
@@ -132,8 +149,6 @@ def user_likes(id):
             try:
                 q = select(Liked_Track).where(Liked_Track.track_id == track_id)
                 existing_like = db.session.scalar(q)
-
-                ic(existing_like)
                 
                 if existing_like:
                     db.session.delete(existing_like)
@@ -149,19 +164,40 @@ def user_likes(id):
                 ic(ex)
                 return make_response({"error": str(ex)}, 400)
 
-@app.get("/users/<int:id>/following")
-def get_following(id):
+@app.get("/users/<int:id>/followers")
+@app.get("/users/<string:username>/followers")
+def get_followers(id = None, username = None):
     try:
-        q = select(Follower).where(Follower.user_id == id)
+        if id:
+            q = select(Follower).join(User.followers).where(User.id == id).order_by(Follower.created_at.desc())
+        if username:
+            q = select(Follower).join(User.followers).where(User.username == username).order_by(Follower.created_at.desc())
+
         result = db.session.scalars(q)
 
-        following = []
+        followers = [
+            row.follower.to_dict() for row in result
+        ]
 
-        for row in result:
-            q = select(User).where(User.id == row.user_following_id)
-            user = db.session.scalar(q).to_dict()
+        return make_response(followers, 200)
+    except Exception as ex:
+        ic(ex)
+        return make_response({"error": str(ex)}, 400)
+    
+@app.get("/users/<int:id>/following")
+@app.get("/users/<string:username>/following")
+def get_following(id = None, username = None):
+    try:
+        if id:
+            q = select(Follower).join(User.following).where(User.id == id).order_by(Follower.created_at.desc())
+        if username:
+            q = select(Follower).join(User.following).where(User.username == username).order_by(Follower.created_at.desc())
+        
+        result = db.session.scalars(q)
 
-            following.append(user)
+        following = [
+            row.followed.to_dict() for row in result
+        ]
 
         return make_response(jsonify(following), 200)
     except Exception as ex:

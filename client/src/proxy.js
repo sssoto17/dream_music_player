@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getLocale } from "./lib/lang";
 import { getCookie } from "./features/auth/session";
 
-const authRoutes = ["/user/dashboard", "/create_account"];
+const authRoutes = ["/user", "/create_account"];
 const pubRoutes = ["/login", "/login/reset"];
 
 const checkAuthRoute = (pathname) => {

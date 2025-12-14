@@ -8,7 +8,7 @@ export default async function SignUp({ params }) {
 	const { locale = "en" } = await params;
 
 	return (
-		<main className="row-span-full grid place-content-center place-items-center bg-linear-to-b from-amber-50 to-fuchsia-100">
+		<main className="col-span-full grid place-content-center place-items-center bg-linear-to-b from-amber-50 to-fuchsia-100">
 			<section className="bg-white rounded-md overflow-clip grid xl:grid-cols-2 mx-20 drop-shadow-xl max-w-content">
 				<Image
 					src={ImgMusic}

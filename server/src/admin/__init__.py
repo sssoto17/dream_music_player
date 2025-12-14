@@ -27,8 +27,6 @@ def block_user(id):
 
         db.session.commit()
 
-        ic(user)
-
         return make_response({"status": f"User updated."}, 200)
     except Exception as ex:
         ic(ex)
@@ -60,7 +58,7 @@ def get_languages():
         with open(path, 'w', encoding='utf-8') as f:
             f.write(json_form)
         
-        return make_response("Languages updated.", 200)
+        return make_response({"message": "success_message_lang"}, 200)
     except Exception as ex:
         ic(ex)
         return make_response(str(ex), 400)

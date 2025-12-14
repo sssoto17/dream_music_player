@@ -25,7 +25,7 @@ export default async function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<body
-				className={`${manrope.variable} bg-linear-to-b from-amber-50 to-fuchsia-100`}
+				className={`${manrope.variable} text-slate-800 bg-linear-to-b from-amber-50 to-fuchsia-100`}
 				suppressHydrationWarning
 			>
 				<ClientProviders>

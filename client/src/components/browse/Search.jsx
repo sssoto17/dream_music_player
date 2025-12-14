@@ -8,7 +8,7 @@ import Image from "next/image";
 import { getLocalizedHref } from "@/lib/utils";
 import { useParams } from "next/navigation";
 
-export function SearchBar({ action, value, isPending }) {
+export function SearchBar({ action, value, isPending, children }) {
 	function handleSearch(e) {
 		const q = new FormData();
 		q.append("q", e.target.value);
@@ -27,7 +27,7 @@ export function SearchBar({ action, value, isPending }) {
 			<input
 				name="q"
 				className="grow focus:outline-0 "
-				placeholder="Search"
+				placeholder={children}
 				defaultValue={value}
 			/>
 			<button
@@ -45,7 +45,7 @@ export function SearchBar({ action, value, isPending }) {
 	);
 }
 
-export function MinimalSearchbar() {
+export function MinimalSearchbar({ children }) {
 	const [state, submit, isPending] = useActionState(SearchAction);
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -71,9 +71,11 @@ export function MinimalSearchbar() {
 
 	const results =
 		state?.result &&
-		[...state?.result?.artists, ...state?.result?.other].toSorted(
-			(a, b) => b.popularity - a.popularity
-		);
+		[
+			...state?.result?.users,
+			...state?.result?.artists,
+			...state?.result?.other,
+		].toSorted((a, b) => b.popularity - a.popularity);
 
 	return (
 		<section className="relative">
@@ -93,7 +95,7 @@ export function MinimalSearchbar() {
 							? ""
 							: "not-group-hover:scale-x-0 not-group-hover:w-0 focus:w-auto focus:scale-x-100"
 					}`}
-					placeholder="Search"
+					placeholder={children}
 					defaultValue={state?.q}
 				/>
 				<button
@@ -162,13 +164,21 @@ function SearchResultsBox({ results, loading, isActive, exitAction }) {
 											? `/browse/album/${item?.id}`
 											: item?.type == "track"
 											? `/browse/album/${item?.abum?.id}`
-											: `/browse/artist/${item?.id}`
+											: item?.type == "artist"
+											? `/browse/artist/${item?.id}`
+											: `/user/${item.username}`
 									}
 									img={
 										item?.type == "album" ||
 										item?.type == "artist"
-											? item.images
-											: item.album.images
+											? item.images[2]
+											: item?.type == "track"
+											? item.album.images[2]
+											: {
+													url: item.avatar,
+													width: 100,
+													height: 100,
+											  }
 									}
 								/>
 							);
@@ -215,15 +225,23 @@ function SearchPlaceholder() {
 	);
 }
 
-function SearchResult({ img, name, artist, url }) {
+function SearchResult({
+	img,
+	name,
+	username,
+	first_name,
+	last_name,
+	artist,
+	url,
+}) {
 	const { locale } = useParams();
 	return (
 		<li className="flex gap-4 py-2 text-sm transition-all duration-75 ease-in relative p-2 mr-2 rounded-md group hover:bg-slate-100">
 			<Image
-				src={img[2]?.url}
-				width={img[2]?.width}
-				height={img[2]?.height}
-				alt={name}
+				src={img?.url}
+				width={img?.width}
+				height={img?.height}
+				alt={name || username}
 				className="aspect-square object-cover w-12 rounded-md"
 			/>
 			<header>
@@ -232,10 +250,10 @@ function SearchResult({ img, name, artist, url }) {
 						className="after:absolute after:inset-0"
 						href={getLocalizedHref(locale, url)}
 					>
-						{name}
+						{name || `${first_name} ${last_name}`}
 					</a>
 				</h4>
-				<p>{artist}</p>
+				<p>{artist || `@${username}`}</p>
 			</header>
 		</li>
 	);

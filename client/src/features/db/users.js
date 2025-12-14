@@ -1,4 +1,3 @@
-import { cacheLife, cacheTag } from "next/cache";
 import { getAvatarSrc } from "@/lib/utils";
 
 const { API_BASE: api_url, AUTH_BASE: auth_url } = process.env;
@@ -14,12 +13,11 @@ export async function createUser(data) {
 	return await res.json();
 }
 
-export async function getUsers(id) {
-	"use cache";
-	cacheLife("minutes");
-	cacheTag("users");
-
-	const res = await fetch(`${api_url}/users` + (id ? `/${id}` : ""));
+export async function getUser(id) {
+	const res = await fetch(`${api_url}/users/${id}`, {
+		cache: "force-cache",
+		next: { revalidate: 300, tags: ["user", "users"] },
+	});
 
 	if (!res.ok) return { error: "User doesn't exist." };
 
@@ -33,11 +31,54 @@ export async function getUsers(id) {
 	return user;
 }
 
-export async function getUserFollowing(id) {
-	"use cache";
-	cacheTag("user_following");
+export async function getUsers() {
+	const res = await fetch(`${api_url}/users`, {
+		cache: "force-cache",
+		next: { revalidate: 300, tags: ["users"] },
+	});
 
-	const res = await fetch(`${api_url}/users/${id}/following`);
+	if (!res.ok) return { error: "No users." };
+
+	return await res.json();
+}
+
+export async function searchUsers(query) {
+	const res = await fetch(`${api_url}/search/users?q=${query}`, {
+		cache: "no-cache",
+		next: { revalidate: 0 },
+	});
+
+	if (!res.ok) return { error: "No matching results." };
+
+	const result = await res.json();
+
+	const users = result.map((user) => {
+		if (user.avatar) {
+			const avatar = getAvatarSrc(user.avatar);
+			user.avatar = avatar;
+			return user;
+		}
+	});
+
+	return users;
+}
+
+export async function getUserFollowers(id) {
+	const res = await fetch(`${api_url}/users/${id}/followers`, {
+		cache: "force-cache",
+		next: { revalidate: 150, tags: ["user", "followers"] },
+	});
+
+	if (!res.ok) return { error: "Could not complete request." };
+
+	return await res.json();
+}
+
+export async function getUserFollowing(id) {
+	const res = await fetch(`${api_url}/users/${id}/following`, {
+		cache: "force-cache",
+		next: { revalidate: 150, tags: ["user", "followers"] },
+	});
 
 	if (!res.ok) return { error: "Could not complete request." };
 

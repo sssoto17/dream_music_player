@@ -2,7 +2,6 @@ from os import environ
 from flask import Blueprint, request, render_template, make_response
 from sqlalchemy import select
 from werkzeug.security import generate_password_hash, check_password_hash
-from uuid import uuid4
 from datetime import datetime, timezone
 
 from ..db import db
@@ -10,12 +9,11 @@ from ..db.models import *
 from ..utils import ic, expires_at, generate_file_path, save_file, delete_file, send_email
 from .validation import validate_verification_key
 
-from . import session, spotify, token
+from . import session, spotify
 
 app = Blueprint('auth', __name__, url_prefix='/auth')
 app.register_blueprint(session.app)
 app.register_blueprint(spotify.app)
-# app.register_blueprint(token.app)
 
 @app.post("/login")
 def authenticate_user():
@@ -49,26 +47,6 @@ def authenticate_user():
     except Exception as ex:
         ic(ex)
         return make_response(str(ex), 400)
-
-# @app.get("/reset/<string:email>")
-# def reset_user(email):
-#     q = select(User).where(User.email == email)
-#     user = db.session.scalar(q)
-
-#     if not user: raise Exception("User doesn't exist.")
-
-#     try:
-#         user.verification_key = uuid4().hex
-#         db.session.commit()
-
-#         if user.verification_key:
-#             email_template = render_template("email/password_reset.html", client_url=environ["CLIENT_URL"], verification_key=user.verification_key)
-#             send_email(user.email, "Reset your password", email_template) 
-        
-#         return make_response({"status": "Password reset initiated."}, 200)
-#     except Exception as ex:
-#         ic(ex)
-#         return make_response({"error": str(ex)}, 400)
 
 @app.route("/me/<int:id>", methods=["GET", "PATCH", "DELETE"])
 def auth_user(id):
@@ -144,7 +122,6 @@ def verify_user(key):
     try:
         q = select(User).where(User.verification_key == validate_verification_key(key))
         user = db.session.scalar(q)
-        ic(user)
 
         if not user: raise Exception("Invalid key.")
 

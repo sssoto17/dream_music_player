@@ -1,5 +1,5 @@
 "use client";
-import { useAuth } from "@/features/auth/hooks";
+import { useAuth } from "@/features/hooks/useAuth";
 
 export default function AuthGuard({ children, placeholder, loader }) {
 	const { isAuth, isLoading } = useAuth();

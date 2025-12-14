@@ -7,17 +7,19 @@ import { useActionState } from "react";
 import { SearchAction } from "@/features/actions/user_actions";
 import { formatDuration } from "@/lib/utils";
 
-export default function Browse({ className: styles }) {
+export default function Browse({ className: styles, children }) {
 	const [state, submit, isPending] = useActionState(SearchAction);
 
 	return (
-		<section className={`py-8 col-span-full ${styles}`}>
+		<section className={styles}>
 			<header>
 				<SearchBar
 					action={submit}
 					value={state?.q}
 					isPending={isPending}
-				/>
+				>
+					{children}
+				</SearchBar>
 			</header>
 			{!state || state?.error ? (
 				<p>{state?.error}</p>
@@ -40,7 +42,7 @@ export default function Browse({ className: styles }) {
 function BrowseScroller({ items, loading }) {
 	return (
 		<article
-			className={`overlay overflow-clip rounded-2xl transition-transform ease-in duration-75 ${
+			className={`content-layout overlay overflow-clip rounded-2xl transition-transform ease-in duration-75 ${
 				loading && "animate-pulse opacity-70"
 			}`}
 		>
@@ -56,7 +58,7 @@ function BrowseScroller({ items, loading }) {
 function BrowseList({ items, loading }) {
 	return (
 		<ul
-			className={`py-8 max-h-180 overflow-y-scroll scroller transition-all ease-in duration-75 ${
+			className={`content-layout my-8 max-h-180 overflow-y-scroll scroller transition-all ease-in duration-75 ${
 				loading && "animate-pulse opacity-70"
 			}`}
 		>

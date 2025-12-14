@@ -79,7 +79,7 @@ export default function PlaybackInterface({ track }) {
 	// };
 
 	return (
-		<nav className="mx-auto max-w-content px-8 *:py-4 flex flex-wrap gap-x-6 justify-center items-center">
+		<nav className="content-layout px-8 *:py-4 flex flex-wrap gap-x-6 justify-center items-center">
 			{/* <article className="absolute left-0 right-0 bottom-0 bg-slate-50/60 backdrop-blur-xs px-8 py-4 *:py-4 flex flex-wrap gap-x-6 justify-center items-center"> */}
 			<PlaybackControls
 				// {...playbackProps}

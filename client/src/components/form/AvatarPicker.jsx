@@ -7,6 +7,7 @@ export default function AvatarPicker({
 	value,
 	submit,
 	remove,
+	removeLabel,
 	children,
 }) {
 	return (
@@ -17,7 +18,7 @@ export default function AvatarPicker({
 			<AvatarPickerIcon hasPreview={value} />
 			{value ? (
 				<span className="z-10 cursor-pointer" onClick={remove}>
-					Remove
+					{removeLabel}
 				</span>
 			) : (
 				children

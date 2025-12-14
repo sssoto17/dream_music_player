@@ -3,6 +3,7 @@
 import { authToggleFollow, authToggleLikeTrack } from "@/features/auth/dal";
 import { getAlbumsByArtist, getSearch } from "@/features/spotify/api";
 import { revalidatePath, updateTag } from "next/cache";
+import { searchUsers } from "../db/users";
 
 const error = { error: "Could not complete request." };
 
@@ -11,8 +12,9 @@ export async function FollowAction(formData) {
 
 	if (!res.ok) return error;
 
-	updateTag("user_following");
-	revalidatePath("/user", "layout");
+	updateTag("user");
+	updateTag("followers");
+	revalidatePath("/", "layout");
 	return await res.json();
 }
 
@@ -26,21 +28,25 @@ export async function LikeAction(formData) {
 
 export async function SearchAction(prev, formData) {
 	if (!formData) {
-		revalidatePath("/");
+		revalidatePath("/", "layout");
 		return { q: "" };
 	}
 
 	const q = formData.get("q");
+	const users = await searchUsers(q);
 	const { tracks, artists, albums, error } = await getSearch(q, 10);
 
-	if (error)
+	if (users?.error || error) {
 		return {
-			error: "No matching results",
+			error: "No matching results.",
 		};
+	}
 
+	updateTag("search");
 	return {
 		q: q,
 		result: {
+			users: users,
 			artists: artists.items,
 			other: [...tracks?.items, ...albums?.items],
 		},

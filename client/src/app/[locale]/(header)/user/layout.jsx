@@ -1,5 +1,0 @@
-export default function UserLayout({ children }) {
-	return (
-		<section className="col-start-2 col-span-full py-8">{children}</section>
-	);
-}

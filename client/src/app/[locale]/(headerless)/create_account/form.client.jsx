@@ -1,6 +1,6 @@
 "use client";
 import { useActionState } from "react";
-import { useUserSettings } from "@/features/auth/hooks";
+import { useUserSettings } from "@/features/hooks/useAuth";
 
 import AvatarPicker from "@/components/form/AvatarPicker";
 import Form, { FormInput } from "@/components/form/Form";

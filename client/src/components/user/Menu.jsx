@@ -19,7 +19,14 @@ import { Suspense } from "react";
 import { getLocalizedHref } from "@/lib/utils";
 import { AvatarIcon, AvatarFallback } from "./Avatar";
 
-export function UserTag({ username, first_name, last_name, avatar, size }) {
+export function UserTag({
+	username,
+	first_name,
+	last_name,
+	avatar,
+	size,
+	dict,
+}) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
@@ -35,26 +42,27 @@ export function UserTag({ username, first_name, last_name, avatar, size }) {
 				<Dropdown
 					username={username}
 					name={`${first_name} ${last_name}`}
+					dict={dict}
 				/>
 			</MenuTrigger>
 		</Suspense>
 	);
 }
 
-function SignOutButton() {
+function SignOutButton({ children }) {
 	const { locale } = useParams();
 	return (
 		<MenuItem
 			onAction={() => Logout(locale)}
 			className="flex gap-2 items-center hover:cursor-pointer hover:bg-slate-100 focus:bg-slate-100 hover:font-medium focus:font-medium hover:text-slate-800 focus:text-slate-800 focus:outline-0 px-2 py-1 rounded-sm"
 		>
-			Sign out
+			{children}
 			<PiSignOut size={16} />
 		</MenuItem>
 	);
 }
 
-function Dropdown({ username, name }) {
+function Dropdown({ username, name, dict }) {
 	const { locale } = useParams();
 	return (
 		<Popover crossOffset={-256 + 48} isNonModal>
@@ -75,23 +83,16 @@ function Dropdown({ username, name }) {
 				</MenuItem>
 				<Separator />
 				<MenuSection className="grid gap-y-1">
-					<DropdownItem
-						href={getLocalizedHref(locale, "/user/dashboard")}
-					>
-						Dashboard
+					<DropdownItem href={"/user/dashboard"}>
+						{dict["dashboard"]}
 					</DropdownItem>
-					<DropdownItem
-						href={getLocalizedHref(
-							locale,
-							"/user/dashboard/settings"
-						)}
-					>
-						Settings
+					<DropdownItem href={"/user/dashboard/settings"}>
+						{dict["settings"]}
 					</DropdownItem>
 				</MenuSection>
 				<MenuSection>
 					<LocaleSwitch />
-					<SignOutButton />
+					<SignOutButton>{dict["signout"]}</SignOutButton>
 				</MenuSection>
 			</Menu>
 		</Popover>
