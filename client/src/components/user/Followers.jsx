@@ -25,7 +25,11 @@ export async function Followers({ params }) {
 						key={user.id}
 						followers={user?.followers_total}
 					>
-						<UserItem {...user} avatar={src} dict={dict} />
+						<UserItem
+							{...user}
+							avatar={user?.avatar && src}
+							dict={dict}
+						/>
 					</FollowersProvider>
 				);
 			})}
@@ -54,7 +58,11 @@ export async function Following({ params }) {
 						key={user.id}
 						followers={user?.followers_total}
 					>
-						<UserItem {...user} avatar={src} dict={dict} />
+						<UserItem
+							{...user}
+							avatar={user?.avatar && src}
+							dict={dict}
+						/>
 					</FollowersProvider>
 				);
 			})}

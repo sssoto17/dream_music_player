@@ -39,7 +39,16 @@ export async function getUsers() {
 
 	if (!res.ok) return { error: "No users." };
 
-	return await res.json();
+	const users = await res.json();
+
+	return users.map((user) => {
+		if (user?.avatar) {
+			const avatar = getAvatarSrc(user.avatar);
+			user.avatar = avatar;
+		}
+
+		return user;
+	});
 }
 
 export async function searchUsers(query) {
@@ -99,4 +108,37 @@ export async function resetUser(email) {
 	if (!res.ok) return { error: "Something went wrong." };
 
 	return await res.json();
+}
+
+export async function getUserPosts(id) {
+	const res = await fetch(`${api_url}/users/${id}/posts`);
+
+	if (!res.ok) return { error: "An error occured." };
+
+	const posts = await res.json();
+
+	return posts.map((post) => {
+		console.log(post.author);
+		if (post.author.avatar) {
+			post.author.avatar = getAvatarSrc(post.author.avatar);
+		}
+
+		return post;
+	});
+}
+
+export async function getUserFeed(id) {
+	const res = await fetch(`${api_url}/users/${id}/feed`);
+
+	if (!res.ok) return { error: "An error occured." };
+
+	const posts = await res.json();
+
+	return posts.map((post) => {
+		if (post.author.avatar) {
+			post.author.avatar = getAvatarSrc(post.author.avatar);
+		}
+
+		return post;
+	});
 }

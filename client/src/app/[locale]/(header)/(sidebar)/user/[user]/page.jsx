@@ -1,4 +1,5 @@
-import { getUsers } from "@/features/db/users";
+import UserFeed from "@/components/user/Post";
+import { getUser, getUserPosts, getUsers } from "@/features/db/users";
 
 export async function generateStaticParams() {
 	const users = await getUsers();
@@ -8,10 +9,12 @@ export async function generateStaticParams() {
 	}));
 }
 
-export default async function UserPage() {
-	return (
-		<section className="col-start-3 col-span-full py-8">
-			<p>Add user activity feed and playlists</p>
-		</section>
-	);
+export default async function UserPage({ params }) {
+	const { user: username } = await params;
+
+	const user = await getUser(username);
+
+	const feed = await getUserPosts(user.id);
+
+	return <UserFeed user={user} feed={feed} />;
 }

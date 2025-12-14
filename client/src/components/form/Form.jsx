@@ -61,3 +61,23 @@ export function FormInput({
 		</div>
 	);
 }
+export function FormTextArea({
+	name,
+	value,
+	placeholder,
+	disabled,
+	rows = 4,
+	children,
+}) {
+	return (
+		<textarea
+			id={name}
+			name={name}
+			className="font-display text-slate-700 resize-none bg-white w-full outline-1 rounded-sm py-1.5 px-2 focus:outline-amber-400 outline-slate-200 hover:outline-slate-300"
+			rows={rows}
+			defaultValue={value}
+			disabled={disabled}
+			placeholder={placeholder || children}
+		/>
+	);
+}

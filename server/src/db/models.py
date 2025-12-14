@@ -31,6 +31,7 @@ class UserFKMixin:
         return relationship(back_populates=bp)
      
 Roles = Literal["admin", "user"]
+MediaTypes = Literal["image", "video", "file"]
 
 # TABLES
 class User(db.Model, IDMixin, TimeStampMixin):
@@ -54,8 +55,8 @@ class User(db.Model, IDMixin, TimeStampMixin):
     token: Mapped["Refresh_Token"] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     user_sessions: Mapped[List["User_Session"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     avatar: Mapped["Avatar"] = relationship(back_populates="user", cascade="save-update, merge, delete, delete-orphan", single_parent=True)
+    posts: Mapped[List["Post"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     likes: Mapped[List["Liked_Track"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
-    # user_blocked: Mapped["Blocked_User"] = relationship(back_populates="user", cascade="all, delete", single_parent=True)
     following: Mapped[List["Follower"]] = relationship(foreign_keys="Follower.user_id",
         back_populates="follower",cascade="all, delete-orphan")
     followers: Mapped[List["Follower"]] = relationship(foreign_keys="Follower.user_following_id",
@@ -120,13 +121,6 @@ class User_Session(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
             "expires_at": self.expires_at,
         }
 
-# class Blocked_User(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
-#     __tablename__ = "users_blocked"
-#     __table_args__ = (
-#          UniqueConstraint("user_id"),
-#     )
-#     __user_back_populates__ = "user_blocked"
-
 class Follower(db.Model, TimeStampMixin):
     __tablename__ = "user_following"
 
@@ -146,6 +140,27 @@ class Follower(db.Model, TimeStampMixin):
             foreign_keys=[user_following_id],
             back_populates="followers",
         )
+
+class Post(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
+    __tablename__ = "user_posts"
+    __user_back_populates__ = "posts"
+
+    content: Mapped[str] = mapped_column(String(500))
+    likes_total: Mapped[int] = mapped_column(default=0)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(default=None)
+
+    media: Mapped[List["Media"]] = relationship(back_populates="post", cascade="save-update, merge, delete, delete-orphan", single_parent=True)
+
+class Media(db.Model, IDMixin):
+    __tablename__ = "user_post_media"
+
+    post_id: Mapped[int] = mapped_column(ForeignKey("user_posts.id"))
+    path: Mapped[str] = mapped_column(String(200))
+    type: Mapped[MediaTypes] = mapped_column(Enum(*get_args(MediaTypes), name="type_enum",
+        create_constraint=True,
+        validate_strings=True,))
+
+    post: Mapped["Post"] = relationship(back_populates="media", cascade="all, delete", passive_deletes=True)
 
 class Liked_Track(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
     __tablename__ = "user_likes"

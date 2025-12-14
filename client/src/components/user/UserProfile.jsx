@@ -20,7 +20,7 @@ export default async function UserProfileSidebar({ locale, id }) {
 				<Link
 					href={getLocalizedHref(locale, `/user/${user?.username}`)}
 				>
-					<Avatar size="full" {...user} className="row-span-2" />
+					<Avatar {...user} className="row-span-2" />
 				</Link>
 			</Suspense>
 			<ProfileDetails locale={locale} {...user} dict={dict} />

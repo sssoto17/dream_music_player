@@ -27,14 +27,13 @@ export default async function Dashboard({ params }) {
 				{authUser.role === "admin" && (
 					<ul>
 						{users.map((user) => {
-							const src = getAvatarSrc(user.avatar);
+							// const src = getAvatarSrc(user.avatar);
 
 							if (user.id === authUser.id) return null;
 							return (
 								<UserItem
 									key={user.id}
 									{...user}
-									avatar={src}
 									isAdmin={authUser?.role == "admin"}
 									dict={dict}
 								/>

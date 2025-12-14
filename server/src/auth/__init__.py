@@ -29,7 +29,6 @@ def authenticate_user():
 
         token = spotify.get_refreshed_token(user.token.refresh_token)
 
-
         if not token["access_token"]: raise Exception(token)
 
         # CREATE SESSION

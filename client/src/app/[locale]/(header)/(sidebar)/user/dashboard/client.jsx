@@ -10,6 +10,7 @@ import FollowersCount, {
 import { AdminBlockButton } from "@/components/admin/Buttons";
 import { useActionState, startTransition } from "react";
 import { BlockUser } from "@/features/actions/admin_actions";
+import { AvatarIcon } from "@/components/user/Avatar";
 
 export function UserItem({
 	id,
@@ -35,14 +36,13 @@ export function UserItem({
 
 	return (
 		<li className="relative text-slate-700 group py-2 text-lg font-medium flex items-center gap-4 text-left hover:cursor-pointer hover:scale-101 transition-all duration-75 ease-in">
-			<Image
+			<AvatarIcon
+				avatar={avatar}
+				username={username}
+				size="lg"
 				className={`${
 					state?.is_blocked && "opacity-60"
 				} aspect-square max-w-20 object-cover rounded-md`}
-				src={avatar}
-				width={200}
-				height={200}
-				alt={username}
 			/>
 			<header className="grow">
 				<h3 className="text-xl font-bold">

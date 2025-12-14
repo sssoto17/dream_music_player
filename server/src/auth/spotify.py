@@ -51,11 +51,9 @@ def get_callback():
         if "code" in request.args:
             token = get_auth_access_token(request.args["code"])
 
-            spotify_data = get(f"{environ["SPOTIFY_API_URL"]}/me", headers={"Authorization": "Bearer " + token["access_token"]}).json()
-
             user = User(
                 username = "",
-                email = spotify_data["email"],
+                email = "",
                 password = generate_password_hash("temp_pass"),
                 first_name = "",
                 last_name = "",

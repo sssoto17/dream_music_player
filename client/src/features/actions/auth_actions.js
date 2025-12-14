@@ -2,7 +2,6 @@
 import { createSession, deleteCookie } from "@/features/auth/session";
 import { resetUser } from "@/features/db/users";
 import {
-	authenticateUser,
 	updateAuthUser,
 	deleteAuthUser,
 	resetAuthUser,
@@ -13,13 +12,26 @@ import { redirect } from "next/navigation";
 import { revalidatePath, updateTag } from "next/cache";
 import { getLocalizedHref } from "@/lib/utils";
 
+const {
+	AUTH_BASE: auth_url,
+	// API_BASE: api_url,
+	// SERVER: server_url,
+} = process.env;
+
 export async function Login(locale, prev, formData) {
 	const data = {
 		email: formData.get("email"),
 		password: formData.get("password"),
 	};
 
-	const session = await authenticateUser(formData);
+	const res = await fetch(`${auth_url}/login`, {
+		method: "POST",
+		body: formData,
+	});
+
+	if (!res.ok) return { ...prev, user: data };
+
+	const session = await res.json();
 
 	if (session?.error) return { ...prev, user: data, error: session.error };
 

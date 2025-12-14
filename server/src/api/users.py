@@ -1,6 +1,6 @@
 from os import environ
 from flask import Blueprint, request, make_response, render_template, jsonify
-from sqlalchemy import select
+from sqlalchemy import select, or_, and_
 from sqlalchemy.sql.operators import ilike_op
 from uuid import uuid4
 
@@ -229,3 +229,78 @@ def user_follow(id):
     except Exception as ex:
         ic(ex)
         return make_response("Follow failed.", 400)
+    
+@app.post("/users/<int:id>/post")
+def create_post(id):
+    try:
+        post = Post(user_id = id, content = request.form.get("post", ""))
+
+        db.session.add(post)
+        db.session.commit()
+
+        return "ok"
+    except Exception as ex:
+        ic(ex)
+        return make_response({"error": str(ex)}, 400)
+    
+@app.get("/users/<int:id>/posts")
+def get_user_posts(id):
+    try:
+        q = select(Post).where(Post.user_id == id).order_by(Post.created_at.desc())
+        result = db.session.scalars(q).unique()
+
+        posts = []
+
+        for row in result:
+            post = {
+            "id": row.id,
+            "content": row.content,
+             "created": row.created_at,
+             "author": {
+                 "username": row.user.username,
+                 "first_name": row.user.first_name,
+                 "last_name": row.user.last_name,
+             },
+             "likes": row.likes_total
+             }
+            
+            if row.user.avatar:
+                post["author"]["avatar"] = row.user.avatar.path
+            
+            posts.append(post)
+
+        return make_response(jsonify(posts), 200)
+    except Exception as ex:
+        ic(ex)
+        return make_response({"error": str(ex)}, 400)
+    
+@app.get("/users/<int:id>/feed")
+def get_user_feed(id):
+    try:
+        q = select(Post).join(Follower.followed).where(or_(and_(Follower.user_id == id, Post.user_id == Follower.user_following_id), Post.user_id == id)).order_by(Post.created_at.desc())
+        result = db.session.scalars(q).unique()
+
+        posts = []
+
+        for row in result:
+            post = {
+            "id": row.id,
+            "content": row.content,
+             "created": row.created_at,
+             "author": {
+                 "username": row.user.username,
+                 "first_name": row.user.first_name,
+                 "last_name": row.user.last_name,
+             },
+             "likes": row.likes_total
+             }
+            
+            if row.user.avatar:
+                post["author"]["avatar"] = row.user.avatar.path
+            
+            posts.append(post)
+
+        return make_response(jsonify(posts), 200)
+    except Exception as ex:
+        ic(ex)
+        return make_response({"error": str(ex)}, 400)

@@ -28,17 +28,6 @@ export async function refreshToken(refresh_token) {
 	return await res.json();
 }
 
-export async function authenticateUser(credentials) {
-	const res = await fetch(`${auth_url}/login`, {
-		method: "POST",
-		body: credentials,
-	});
-
-	if (!res.ok) return { error: "Wrong email or password." };
-
-	return await res.json();
-}
-
 export async function getAuthUser() {
 	const { isAuth, user_id } = await verifySessionServer();
 
