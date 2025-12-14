@@ -27,13 +27,13 @@ export const getAuthUserClient = async () => {
 	return await res.json();
 };
 
-export const deleteSessionClient = async () => {
-	const res = await fetch("/api/session/signout", {
-		method: "GET",
-		credentials: "include",
-	});
+// export const deleteSessionClient = async () => {
+// 	const res = await fetch("/api/session/signout", {
+// 		method: "GET",
+// 		credentials: "include",
+// 	});
 
-	if (!res.ok) return;
+// 	if (!res.ok) return;
 
-	return await res.json();
-};
+// 	return await res.json();
+// };

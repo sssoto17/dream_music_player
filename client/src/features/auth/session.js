@@ -5,6 +5,8 @@ const { AUTH_BASE: auth_url, CLIENT: api } = process.env;
 
 export const cookie_options = {
 	maxAge: 3600, // expires cookie after one hour
+	secure: true,
+	httpOnly: true,
 	sameSite: "lax",
 	path: "/",
 };

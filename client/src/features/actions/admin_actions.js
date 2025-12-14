@@ -1,8 +1,18 @@
 "use server";
 import { updateTag } from "next/cache";
+import { getCookie } from "../auth/session";
+
+const { ADMIN_BASE: admin_url } = process.env;
 
 export async function ImportLanguages() {
-	const res = await fetch(`/api/admin/languages`);
+	const user_id = await getCookie("user_id");
+
+	const res = await fetch(`${admin_url}/lang-support`, {
+		method: "GET",
+		headers: {
+			cookie: `user_id=${user_id}`,
+		},
+	});
 
 	if (!res.ok)
 		return {

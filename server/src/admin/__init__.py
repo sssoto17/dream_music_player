@@ -1,5 +1,5 @@
 from os import getcwd
-from flask import Blueprint, make_response
+from flask import Blueprint, request, make_response
 from requests import get
 from json import dumps, load
 from csv import DictReader
@@ -34,8 +34,14 @@ def block_user(id):
 
 @app.route("/lang-support")
 def get_languages():
-    # Check if the admin is running this end-point, else show error
     try:
+        user_id = request.cookies["user_id"]
+        
+        q = select(User.role).where(User.id == user_id)
+        user_role = db.session.scalar(q)
+
+        if user_role != "admin": return Exception("Unauthorized: User does not have the necessary permissions to perform this action.", 401)
+
         res = get(url=formSheet)
         csv = StringIO(res.content.decode('utf-8'))
        
