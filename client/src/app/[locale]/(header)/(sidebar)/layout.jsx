@@ -1,6 +1,15 @@
+import { getUsers } from "@/features/db/users";
 import { Suspense } from "react";
 
-export default async function SidebarLayout({ sidebar, children }) {
+export async function generateStaticParams() {
+	const users = await getUsers();
+
+	return users?.map((user) => ({
+		user: user.username,
+	}));
+}
+
+export default function SidebarLayout({ sidebar, children }) {
 	return (
 		<div className="content-layout grid grid-cols-5 gap-x-4">
 			<aside className="group py-8 col-span-2 justify-items-start text-slate-700 mb-20">

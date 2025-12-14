@@ -1,15 +1,15 @@
 "use client";
 
-import { FaUserAltSlash } from "react-icons/fa";
 import Image from "next/image";
-import { startTransition } from "react";
-import { BlockUser } from "@/features/actions/auth_actions";
 import Link from "next/link";
 import { getLocalizedHref } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import FollowersCount, {
 	FollowersProvider,
 } from "@/components/user/DynamicFollowers";
+import { AdminBlockButton } from "@/components/admin/Buttons";
+import { useActionState, startTransition } from "react";
+import { BlockUser } from "@/features/actions/admin_actions";
 
 export function UserItem({
 	id,
@@ -19,20 +19,25 @@ export function UserItem({
 	last_name,
 	followers_total,
 	isAdmin,
-	isBlocked,
+	is_blocked,
 	dict,
 }) {
 	const { locale = "en" } = useParams();
+	const [state, submit, isPending] = useActionState(BlockUser, {
+		is_blocked: is_blocked,
+	});
+
 	function handleAdminBlock() {
 		startTransition(() => {
-			BlockUser(id);
+			submit(id);
 		});
 	}
+
 	return (
 		<li className="relative text-slate-700 group py-2 text-lg font-medium flex items-center gap-4 text-left hover:cursor-pointer hover:scale-101 transition-all duration-75 ease-in">
 			<Image
 				className={`${
-					isBlocked && "opacity-60"
+					state?.is_blocked && "opacity-60"
 				} aspect-square max-w-20 object-cover rounded-md`}
 				src={avatar}
 				width={200}
@@ -47,7 +52,7 @@ export function UserItem({
 					>
 						{first_name + " " + last_name}
 					</Link>
-					{isBlocked && (
+					{state?.is_blocked && (
 						<span className="ml-2 text-sm uppercase text-slate-600 font-medium font-copy">
 							Restricted
 						</span>
@@ -56,21 +61,14 @@ export function UserItem({
 				<p className="text-sm text-slate-500">@{username}</p>
 			</header>
 			<FollowersProvider followers={followers_total}>
-				<FollowersCount
-					username={username}
-					single={dict["follower"]}
-					multi={dict["followers"]}
-					none={dict["no_followers"]}
-				/>
+				<FollowersCount username={username} dict={dict} />
 			</FollowersProvider>
 			{isAdmin && (
-				<button
-					onClick={handleAdminBlock}
-					aria-label="Block user"
-					className="not-group-hover:opacity-0 cursor-pointer hover:scale-105"
-				>
-					<FaUserAltSlash />
-				</button>
+				<AdminBlockButton
+					{...state}
+					isPending={isPending}
+					action={handleAdminBlock}
+				/>
 			)}
 		</li>
 	);

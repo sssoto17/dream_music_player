@@ -34,9 +34,7 @@ export function useFollowersContext(selector) {
 export default function FollowersCount({
 	username,
 	icon,
-	single,
-	multi,
-	none,
+	dict,
 	className: styles,
 }) {
 	const { locale } = useParams();
@@ -49,10 +47,10 @@ export default function FollowersCount({
 		>
 			{icon && <GoPeople />}
 			{!followers
-				? { none }
+				? dict["no_followers"]
 				: followers === 1
-				? `${followers} ${single}`
-				: `${followers} ${multi}`}
+				? `${followers} ${dict["follower"]}`
+				: `${followers} ${dict["followers"]}`}
 		</Link>
 	);
 }

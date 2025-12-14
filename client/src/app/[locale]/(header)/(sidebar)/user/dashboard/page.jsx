@@ -3,7 +3,7 @@ import { getUsers } from "@/features/db/users";
 import Browse from "@/components/browse/Browse";
 import { UserItem } from "./client";
 import { getAuthUser } from "@/features/auth/dal";
-import { AdminLanguageButton } from "@/components/user/Buttons";
+import { AdminLanguageButton } from "@/components/admin/Buttons";
 import { getLang } from "@/lib/lang";
 
 export default async function Dashboard({ params }) {

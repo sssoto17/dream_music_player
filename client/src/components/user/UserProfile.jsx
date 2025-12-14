@@ -7,7 +7,7 @@ import { FaHeart } from "react-icons/fa";
 import { RiPoliceBadgeLine } from "react-icons/ri";
 import { Suspense } from "react";
 import { getUser } from "@/features/db/users";
-import FollowersCount, { FollowersProvider } from "./DynamicFollowers";
+import FollowersCount from "./DynamicFollowers";
 import { getLang } from "@/lib/lang";
 
 export default async function UserProfileSidebar({ locale, id }) {
@@ -35,7 +35,6 @@ function ProfileDetails({
 	last_name,
 	bio,
 	created_at,
-	followers_total,
 	role,
 	dict,
 }) {
@@ -63,16 +62,12 @@ function ProfileDetails({
 					@{username}
 				</Link>
 			</header>
-			<FollowersProvider followers={followers_total}>
-				<FollowersCount
-					username={username}
-					className="font-display"
-					icon
-					single={dict["follower"]}
-					multi={dict["followers"]}
-					none={dict["no_followers"]}
-				/>
-			</FollowersProvider>
+			<FollowersCount
+				username={username}
+				className="font-display"
+				icon
+				dict={dict}
+			/>
 			<p className="text-sm/tight py-4 text-slate-500 cursor-default">
 				{dict["member_since"]}{" "}
 				<span className="font-medium">{member_since}</span>

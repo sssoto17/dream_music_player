@@ -1,4 +1,3 @@
-import Browse from "@/components/browse/Browse";
 import { getAuthUser } from "@/features/auth/dal";
 import { redirect } from "next/navigation";
 import { getLocalizedHref } from "@/lib/utils";

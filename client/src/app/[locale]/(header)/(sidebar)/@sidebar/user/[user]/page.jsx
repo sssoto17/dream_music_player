@@ -18,16 +18,14 @@ export default async function UserSidebar({ params }) {
 
 	return (
 		<Suspense>
-			<UserProfile locale={locale} id={username} />
-			{username !== authUser && (
-				<FollowersProvider
-					followers={followers_total}
-					isFollowing={isFollowing}
-				>
-					<UserFollowButton dict={dict} />
-				</FollowersProvider>
-			)}
-			{username === authUser && <UserPlaylists />}
+			<FollowersProvider
+				followers={followers_total}
+				isFollowing={isFollowing}
+			>
+				<UserProfile locale={locale} id={username} />
+				{username !== authUser && <UserFollowButton dict={dict} />}
+				{username === authUser && <UserPlaylists />}
+			</FollowersProvider>
 		</Suspense>
 	);
 }

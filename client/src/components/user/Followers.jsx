@@ -3,6 +3,7 @@ import { getAvatarSrc } from "@/lib/utils";
 import { getAuthUser } from "@/features/auth/dal";
 import { getUserFollowers, getUserFollowing } from "@/features/db/users";
 import { getLang } from "@/lib/lang";
+import { FollowersProvider } from "./DynamicFollowers";
 
 export async function Followers({ params }) {
 	const {
@@ -19,14 +20,13 @@ export async function Followers({ params }) {
 		<ul>
 			{followers.map((user) => {
 				const src = getAvatarSrc(user.avatar);
-
 				return (
-					<UserItem
+					<FollowersProvider
 						key={user.id}
-						{...user}
-						avatar={src}
-						dict={dict}
-					/>
+						followers={user?.followers_total}
+					>
+						<UserItem {...user} avatar={src} dict={dict} />
+					</FollowersProvider>
 				);
 			})}
 		</ul>
@@ -50,12 +50,12 @@ export async function Following({ params }) {
 				const src = getAvatarSrc(user.avatar);
 
 				return (
-					<UserItem
+					<FollowersProvider
 						key={user.id}
-						{...user}
-						avatar={src}
-						dict={dict}
-					/>
+						followers={user?.followers_total}
+					>
+						<UserItem {...user} avatar={src} dict={dict} />
+					</FollowersProvider>
 				);
 			})}
 		</ul>

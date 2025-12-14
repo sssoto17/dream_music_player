@@ -1,7 +1,7 @@
 "use client";
 
 import useAuth from "@/features/hooks/useAuth";
-import { startTransition, useActionState, useState } from "react";
+import { startTransition } from "react";
 import { FaPlus, FaRegHeart, FaHeart } from "react-icons/fa";
 import { LikeAction, FollowAction } from "@/features/actions/user_actions";
 import { getLocalizedHref } from "@/lib/utils";
@@ -89,50 +89,9 @@ export function UserFollowButton({ dict }) {
 					e.target.textContent = dict["following"];
 				}
 			}}
-			className={`${stateStyle} text-white my-8 max-w-48 w-full flex place-content-center items-center gap-2 mx-auto rounded-full py-2 px-4 font-semibold font-display cursor-pointer hover:scale-101 transition-all duration-75 ease-in`}
+			className={`${stateStyle} text-white my-8 max-w-48 w-full flex place-content-center items-center gap-2 rounded-full py-2 px-4 font-semibold font-display cursor-pointer hover:scale-101 transition-all duration-75 ease-in`}
 		>
 			{isActive ? dict["following"] : dict["follow"]}
 		</button>
-	);
-}
-
-import { GrLanguage } from "react-icons/gr";
-import { ImSpinner2 } from "react-icons/im";
-import { ImportLanguages } from "@/features/actions/admin_actions";
-import Toast from "../global/Toast";
-
-export function AdminLanguageButton({ dict, children }) {
-	const [state, submit, isPending] = useActionState(ImportLanguages);
-	const [toastActive, setToastActive] = useState(false);
-
-	function handleLanguages() {
-		startTransition(() => {
-			submit();
-		});
-
-		setToastActive(true);
-	}
-
-	return (
-		<>
-			<button
-				onClick={handleLanguages}
-				disabled={isPending}
-				className={`group bg-slate-700 hover:bg-slate-600 disabled:bg-slate-300 text-white max-w-48 w-full flex place-content-center items-center gap-2 rounded-full py-1 px-2 font-semibold font-display text-sm cursor-pointer transition-all duration-75 ease-in`}
-			>
-				<GrLanguage className="group-disabled:hidden" />
-				<ImSpinner2 className="not-group-disabled:hidden animate-spin" />
-				{children}
-			</button>
-			{!isPending && toastActive && (
-				<Toast
-					title={dict[state?.title]}
-					error={Boolean(!state?.success)}
-					close={setToastActive}
-				>
-					{dict[state?.message]}
-				</Toast>
-			)}
-		</>
 	);
 }

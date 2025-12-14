@@ -49,13 +49,13 @@ class User(db.Model, IDMixin, TimeStampMixin):
     role: Mapped[Roles] = mapped_column(Enum(*get_args(Roles), name="role_enum",
         create_constraint=True,
         validate_strings=True,))
-    # is_blocked: Mapped[bool] = mapped_column(default=False)
+    is_blocked: Mapped[bool] = mapped_column(default=False)
 
     token: Mapped["Refresh_Token"] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     user_sessions: Mapped[List["User_Session"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
     avatar: Mapped["Avatar"] = relationship(back_populates="user", cascade="save-update, merge, delete, delete-orphan", single_parent=True)
     likes: Mapped[List["Liked_Track"]] = relationship(back_populates="user", cascade="all, delete", passive_deletes=True)
-    user_blocked: Mapped["Blocked_User"] = relationship(back_populates="user", cascade="all, delete", single_parent=True)
+    # user_blocked: Mapped["Blocked_User"] = relationship(back_populates="user", cascade="all, delete", single_parent=True)
     following: Mapped[List["Follower"]] = relationship(foreign_keys="Follower.user_id",
         back_populates="follower",cascade="all, delete-orphan")
     followers: Mapped[List["Follower"]] = relationship(foreign_keys="Follower.user_following_id",
@@ -120,12 +120,12 @@ class User_Session(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
             "expires_at": self.expires_at,
         }
 
-class Blocked_User(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
-    __tablename__ = "users_blocked"
-    __table_args__ = (
-         UniqueConstraint("user_id"),
-    )
-    __user_back_populates__ = "user_blocked"
+# class Blocked_User(db.Model, IDMixin, UserFKMixin, TimeStampMixin):
+#     __tablename__ = "users_blocked"
+#     __table_args__ = (
+#          UniqueConstraint("user_id"),
+#     )
+#     __user_back_populates__ = "user_blocked"
 
 class Follower(db.Model, TimeStampMixin):
     __tablename__ = "user_following"

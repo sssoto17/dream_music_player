@@ -167,15 +167,3 @@ export async function getAuthLikes() {
 
 	return await res.json();
 }
-
-export async function adminBlockUser(id) {
-	const { isAuth } = await verifySessionClient();
-
-	if (!isAuth) return { isAuth };
-
-	const res = await fetch(`${server_url}/admin/restrict/${id}`);
-
-	if (!res.ok) return { error: "Could not complete request." };
-
-	return await res.json();
-}

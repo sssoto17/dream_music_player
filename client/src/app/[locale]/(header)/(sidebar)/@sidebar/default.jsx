@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getAuthUser } from "@/features/auth/dal";
 import UserProfile from "@/components/user/UserProfile";
+import { FollowersProvider } from "@/components/user/DynamicFollowers";
 
 export default async function IndexSidebar({ params }) {
 	const { locale = "en" } = await params;
@@ -10,8 +11,13 @@ export default async function IndexSidebar({ params }) {
 
 	return (
 		<Suspense>
-			<UserProfile locale={locale} {...user} />
-			{/* trending music? friends listening to? */}
+			<FollowersProvider
+				followers={user?.followers_total}
+				isFollowing={false}
+			>
+				<UserProfile locale={locale} {...user} />
+				{/* trending music? friends listening to? */}
+			</FollowersProvider>
 		</Suspense>
 	);
 }

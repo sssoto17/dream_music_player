@@ -6,7 +6,6 @@ import {
 	updateAuthUser,
 	deleteAuthUser,
 	resetAuthUser,
-	adminBlockUser,
 } from "@/features/auth/dal";
 import { validateData } from "@/features/db/schema";
 
@@ -180,12 +179,4 @@ export async function DeleteAccount() {
 	// display a toast with a success message, followed by a redirect to home after a couple sec
 	revalidatePath("/", "layout");
 	redirect("/"); // redirect to successful deletion page which will automatically redirect to homepage after three seconds
-}
-
-export async function BlockUser(user_id) {
-	const res = await adminBlockUser(user_id);
-
-	if (!res.ok) return error;
-
-	return await res.json();
 }
